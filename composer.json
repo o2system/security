@@ -1,0 +1,46 @@
+{
+  "name": "o2system/security",
+  "description": "O2System Security",
+  "type": "php-interfaces",
+  "keywords": [
+    "utilities",
+    "php",
+    "framework",
+    "libraries",
+    "interfaces"
+  ],
+  "authors": [
+    {
+      "name": "Steeven Andrian Salim",
+      "email": "steevenz@steevenz.com",
+      "homepage": "http://www.steevenz.com",
+      "role": "Founder and Lead Project"
+    },
+    {
+      "name": "Teguh Rianto",
+      "email": "teguh.rianto22@gmail.com",
+      "homepage": "http://teguhrianto22.pusku.com",
+      "role": "Template Designer"
+    }
+  ],
+  "support": {
+    "email": "o2system.framework@gmail.com",
+    "issues": "https://github.com/o2system/psr/issues",
+    "forum": "https://www.facebook.com/groups/498147006994512"
+  },
+  "links": {
+    "info": "http://www.o2system.id/libraries/psr.html",
+    "documentation": "http://www.o2system.id/libraries/psr/documentation.html",
+    "github-wiki": "http://github.com/o2system/psr/wiki"
+  },
+  "require": {
+    "php": ">=5.4.0",
+    "o2system/session":"*"
+  },
+  "autoload": {
+    "psr-4": {
+      "O2System\\Security\\": "src"
+    }
+  },
+  "minimum-stability": "dev"
+}
