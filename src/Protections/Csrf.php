@@ -12,18 +12,19 @@
 
 namespace O2System\Security\Protections;
 
+// ------------------------------------------------------------------------
 
+/**
+ * Class Csrf
+ *
+ * @package O2System\Security\Protections
+ */
 class Csrf
 {
     /**
-     * Is Enabled Flag
-     *
-     * @var bool
-     */
-    private $isEnabled = false;
-
-    /**
-     * CSRF Token
+     * Csrf::$token
+     * 
+     * Active CSRF protection token.
      *
      * @var string
      */
@@ -32,23 +33,23 @@ class Csrf
     // ------------------------------------------------------------------------
 
     /**
-     * Initialize CSRF Security Protection
+     * Csrf::__construct
      */
-    public function initialize ()
+    public function __construct ()
     {
         if ( false === ( $this->token = $this->getToken() ) ) {
             $this->regenerate();
         }
-
-        $this->isEnabled = true;
     }
 
     // ------------------------------------------------------------------------
 
     /**
-     * Get Token
+     * Csrf::getToken
      *
-     * @return array|bool|null
+     * Gets session CSRF protection token.
+     *
+     * @return string|bool Returns FALSE if CSRF protection token is not set.
      */
     public function getToken ()
     {
@@ -59,10 +60,14 @@ class Csrf
         return false;
     }
 
+    // ------------------------------------------------------------------------
+
     /**
-     * Regenerate
+     * Csrf::regenerate
      *
-     * Regenerate CSRF Token
+     * Regenerate CSRF protection token.
+     *
+     * @return void
      */
     public function regenerate ()
     {
@@ -72,32 +77,24 @@ class Csrf
     // ------------------------------------------------------------------------
 
     /**
-     * Validate Token
+     * Csrf::verify
+     *
+     * Checks if the posted CSRF protection token is valid.
      *
      * @param string $token
      *
      * @return bool
      */
-    public function validateToken ( $token )
+    public function verify ( $token = null )
     {
+        $token = isset( $token )
+            ? $token
+            : input()->postGet( 'csrfToken' );
+
         if ( false !== ( $this->getToken() === $token ) ) {
             return true;
         }
 
         return false;
-    }
-
-    // ------------------------------------------------------------------------
-
-    /**
-     * Is Enabled
-     *
-     * Check whether CSRF is enabled
-     *
-     * @return bool
-     */
-    public function isEnabled ()
-    {
-        return (bool) $this->isEnabled;
     }
 }

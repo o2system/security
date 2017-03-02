@@ -12,7 +12,13 @@
 
 namespace O2System\Security\Filters;
 
+// ------------------------------------------------------------------------
 
+/**
+ * Class Validation
+ *
+ * @package O2System\Security\Filters
+ */
 class Validation
 {
 

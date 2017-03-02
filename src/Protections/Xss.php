@@ -12,18 +12,17 @@
 
 namespace O2System\Security\Protections;
 
-
+/**
+ * Class Xss
+ *
+ * @package O2System\Security\Protections
+ */
 class Xss
 {
     /**
-     * Is Enabled Flag
-     *
-     * @var bool
-     */
-    private $isEnabled = false;
-
-    /**
-     * XSS Token
+     * Xss::$token
+     * 
+     * Active XSS protection token.
      *
      * @var string
      */
@@ -31,114 +30,26 @@ class Xss
 
     // ------------------------------------------------------------------------
 
+    /**
+     * Xss::__construct
+     */
     public function __construct ()
     {
-        $this->config = [
-            /**
-             * List of never allowed strings
-             *
-             * @var    array
-             */
-            'never_allowed_strings'  => [
-                'document.cookie' => '[removed]',
-                'document.write'  => '[removed]',
-                '.parentNode'     => '[removed]',
-                '.innerHTML'      => '[removed]',
-                '-moz-binding'    => '[removed]',
-                '<!--'            => '&lt;!--',
-                '-->'             => '--&gt;',
-                '<![CDATA['       => '&lt;![CDATA[',
-                '<comment>'       => '&lt;comment&gt;',
-            ],
+        $this->config = require( str_replace( 'Protections', 'Config', __DIR__ ) . DIRECTORY_SEPARATOR . 'Xss.php' );
 
-            /**
-             * List of never allowed regex replacements
-             *
-             * @var    array
-             */
-            'never_allowed_regex'    => [
-                'javascript\s*:',
-                '(document|(document\.)?window)\.(location|on\w*)',
-                'expression\s*(\(|&\#40;)', // CSS and IE
-                'vbscript\s*:', // IE, surprise!
-                'wscript\s*:', // IE
-                'jscript\s*:', // IE
-                'vbs\s*:', // IE
-                'Redirect\s+30\d',
-                "([\"'])?data\s*:[^\\1]*?base64[^\\1]*?,[^\\1]*?\\1?",
-            ],
-
-            /**
-             * List of naughty html tags
-             *
-             * @var    array
-             */
-            'naughty_tags'           => [
-                'alert', 'prompt', 'confirm', 'applet', 'audio', 'basefont', 'base', 'behavior', 'bgsound',
-                'blink', 'body', 'embed', 'expression', 'form', 'frameset', 'frame', 'head', 'html', 'ilayer',
-                'iframe', 'input', 'button', 'select', 'isindex', 'layer', 'link', 'meta', 'keygen', 'object',
-                'plaintext', 'style', 'script', 'textarea', 'title', 'math', 'video', 'svg', 'xml', 'xss',
-            ],
-
-            /**
-             * List of evil html tags attributes
-             *
-             * @var    array
-             */
-            'evil_attributes'        => [
-                'on\w+', 'style', 'xmlns', 'formaction', 'form', 'xlink:href', 'FSCommand', 'seekSegmentTime',
-            ],
-
-            /**
-             * List of sql commands
-             *
-             * @var    array
-             */
-            'sql_injection_commands' => [
-                'union',
-                'sql',
-                'mysql',
-                'database',
-                'cookie',
-                'coockie',
-                'select',
-                'from',
-                'where',
-                'benchmark',
-                'concat',
-                'table',
-                'into',
-                'by',
-                'values',
-                'exec',
-                'shell',
-                'truncate',
-                'wget',
-                '/**/',
-            ],
-        ];
+        if ( false === ( $this->token = $this->getToken() ) ) {
+            $this->regenerate();
+        }
     }
 
     // --------------------------------------------------------------------------------------
 
     /**
-     * Initialize XSS Security Protection
-     */
-    public function initialize ()
-    {
-        if ( false === ( $this->token = $this->getToken() ) ) {
-            $this->regenerate();
-        }
-
-        $this->isEnabled = true;
-    }
-
-    // ------------------------------------------------------------------------
-
-    /**
-     * Get Token
+     * Xss::getToken
      *
-     * @return array|bool|null
+     * Gets session XSS protection token.
+     *
+     * @return string|bool Returns FALSE if XSS protection token is not set.
      */
     public function getToken ()
     {
@@ -149,10 +60,14 @@ class Xss
         return false;
     }
 
+    // ------------------------------------------------------------------------
+
     /**
-     * Regenerate
+     * Xss::regenerate
      *
-     * Regenerate XSS Token
+     * Regenerate XSS protection token.
+     *
+     * @return void
      */
     public function regenerate ()
     {
@@ -162,14 +77,20 @@ class Xss
     // ------------------------------------------------------------------------
 
     /**
-     * Validate Token
+     * Csrf::verify
+     *
+     * Checks if the posted XSS protection token is valid.
      *
      * @param string $token
      *
      * @return bool
      */
-    public function validateToken ( $token )
+    public function verify ( $token = null )
     {
+        $token = isset( $token )
+            ? $token
+            : input()->postGet( 'xssToken' );
+
         if ( false !== ( $this->getToken() === $token ) ) {
             return true;
         }
@@ -178,20 +99,6 @@ class Xss
     }
 
     // ------------------------------------------------------------------------
-
-    /**
-     * Is Enabled
-     *
-     * Check whether XSS is enabled
-     *
-     * @return bool
-     */
-    public function isEnabled ()
-    {
-        return (bool) $this->isEnabled;
-    }
-
-    // --------------------------------------------------------------------------------------
 
     /**
      * Clean
@@ -226,8 +133,7 @@ class Xss
          */
         do {
             $string = rawurldecode( $string );
-        }
-        while ( preg_match( '/%[0-9a-f]{2,}/i', $string ) );
+        } while ( preg_match( '/%[0-9a-f]{2,}/i', $string ) );
 
         /*
          * Convert character entities to ASCII
@@ -288,9 +194,23 @@ class Xss
          * These words are compacted back to their correct state.
          */
         $words = [
-            'javascript', 'expression', 'vbscript', 'jscript', 'wscript',
-            'vbs', 'script', 'base64', 'applet', 'alert', 'document',
-            'write', 'cookie', 'window', 'confirm', 'prompt', 'eval',
+            'javascript',
+            'expression',
+            'vbscript',
+            'jscript',
+            'wscript',
+            'vbs',
+            'script',
+            'base64',
+            'applet',
+            'alert',
+            'document',
+            'write',
+            'cookie',
+            'window',
+            'confirm',
+            'prompt',
+            'eval',
         ];
 
         foreach ( $words as $word ) {
@@ -336,8 +256,7 @@ class Xss
             if ( preg_match( '/script|xss/i', $string ) ) {
                 $string = preg_replace( '#</*(?:script|xss).*?>#si', '[removed]', $string );
             }
-        }
-        while ( $original !== $string );
+        } while ( $original !== $string );
         unset( $original );
 
         /*
@@ -350,16 +269,24 @@ class Xss
          * Becomes: &lt;blink&gt;
          */
         $pattern = '#'
-                   . '<((?<slash>/*\s*)(?<tagName>[a-z0-9]+)(?=[^a-z0-9]|$)' // tag start and name, followed by a non-tag character
-                   . '[^\s\042\047a-z0-9>/=]*' // a valid attribute character immediately after the tag would count as a separator
+                   . '<((?<slash>/*\s*)(?<tagName>[a-z0-9]+)(?=[^a-z0-9]|$)'
+                   // tag start and name, followed by a non-tag character
+                   . '[^\s\042\047a-z0-9>/=]*'
+                   // a valid attribute character immediately after the tag would count as a separator
                    // optional attributes
-                   . '(?<attributes>(?:[\s\042\047/=]*' // non-attribute characters, excluding > (tag close) for obvious reasons
-                   . '[^\s\042\047>/=]+' // attribute characters
+                   . '(?<attributes>(?:[\s\042\047/=]*'
+                   // non-attribute characters, excluding > (tag close) for obvious reasons
+                   . '[^\s\042\047>/=]+'
+                   // attribute characters
                    // optional attribute-value
-                   . '(?:\s*=' // attribute-value separator
-                   . '(?:[^\s\042\047=><`]+|\s*\042[^\042]*\042|\s*\047[^\047]*\047|\s*(?U:[^\s\042\047=><`]*))' // single, double or non-quoted value
-                   . ')?' // end optional attribute-value group
-                   . ')*)' // end optional attributes group
+                   . '(?:\s*='
+                   // attribute-value separator
+                   . '(?:[^\s\042\047=><`]+|\s*\042[^\042]*\042|\s*\047[^\047]*\047|\s*(?U:[^\s\042\047=><`]*))'
+                   // single, double or non-quoted value
+                   . ')?'
+                   // end optional attribute-value group
+                   . ')*)'
+                   // end optional attributes group
                    . '[^>]*)(?<closeTag>\>)?#isS';
         // Note: It would be nice to optimize this for speed, BUT
         //       only matching the naughty elements here results in
@@ -367,8 +294,7 @@ class Xss
         do {
             $old_string = $string;
             $string = preg_replace_callback( $pattern, [ $this, 'sanitizeNaughtyHTML' ], $string );
-        }
-        while ( $old_string !== $string );
+        } while ( $old_string !== $string );
 
         unset( $old_string );
 
@@ -484,9 +410,11 @@ class Xss
 
             // Attribute-catching pattern
             $attributes_pattern = '#'
-                                  . '(?<name>[^\s\042\047>/=]+)' // attribute characters
+                                  . '(?<name>[^\s\042\047>/=]+)'
+                                  // attribute characters
                                   // optional attribute-value
-                                  . '(?:\s*=(?<value>[^\s\042\047=><`]+|\s*\042[^\042]*\042|\s*\047[^\047]*\047|\s*(?U:[^\s\042\047=><`]*)))' // attribute-value separator
+                                  . '(?:\s*=(?<value>[^\s\042\047=><`]+|\s*\042[^\042]*\042|\s*\047[^\047]*\047|\s*(?U:[^\s\042\047=><`]*)))'
+                                  // attribute-value separator
                                   . '#i';
 
             // Blacklist pattern for evil attribute names
@@ -519,9 +447,7 @@ class Xss
                     $matches[ 'attributes' ],
                     $attribute[ 0 ][ 1 ] + strlen( $attribute[ 0 ][ 0 ] )
                 );
-            }
-
-            while ( $matches[ 'attributes' ] !== '' );
+            } while ( $matches[ 'attributes' ] !== '' );
             $attributes = empty( $attributes )
                 ? ''
                 : ' ' . implode( ' ', $attributes );
@@ -719,8 +645,7 @@ class Xss
                 $flag,
                 $charset
             );
-        }
-        while ( $str_compare !== $string );
+        } while ( $str_compare !== $string );
 
         return $string;
     }

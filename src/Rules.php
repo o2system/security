@@ -12,9 +12,9 @@
 
 namespace O2System\Security;
 
-use O2System\Kernel\Spl\Exceptions\Logic\BadFunctionCall\BadMethodCallException;
-use O2System\Kernel\Spl\Exceptions\Logic\InvalidArgumentException;
-use O2System\Kernel\Spl\Exceptions\Logic\OutOfRangeException;
+use O2System\Spl\Exceptions\Logic\BadFunctionCall\BadMethodCallException;
+use O2System\Spl\Exceptions\Logic\InvalidArgumentException;
+use O2System\Spl\Exceptions\Logic\OutOfRangeException;
 use O2System\Security\Filters\Validation;
 
 /**
