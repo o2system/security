@@ -49,23 +49,7 @@ class Password
      *
      * @var array
      */
-    private $options = [ ];
-
-    // ------------------------------------------------------------------------
-
-    /**
-     * Password::setSalt
-     *
-     * @param string $salt Encryption key.
-     *
-     * @return static
-     */
-    protected function setSalt ( $salt )
-    {
-        $this->salt = md5( $salt, true );
-
-        return $this;
-    }
+    private $options = [];
 
     // ------------------------------------------------------------------------
 
@@ -80,7 +64,7 @@ class Password
      *
      * @return static
      */
-    public function setAlgorithm ( $algorithm )
+    public function setAlgorithm( $algorithm )
     {
         if ( in_array(
             $algorithm,
@@ -109,49 +93,11 @@ class Password
      *
      * @return $this
      */
-    public function setOptions ( array $options )
+    public function setOptions( array $options )
     {
         $this->options = $options;
 
         return $this;
-    }
-
-    // ------------------------------------------------------------------------
-
-    /**
-     * Password::protect
-     *
-     * Protect a password.
-     *
-     * @param string $password Password to be encrypted.
-     * @param string $salt     To manually provide a salt to use when hashing the password.
-     *
-     * @return string
-     */
-    protected function protect ( $password, $salt = null )
-    {
-        $salt = isset( $salt )
-            ? $salt
-            : $this->salt;
-
-        return $password . $salt;
-    }
-
-    // ------------------------------------------------------------------------
-
-    /**
-     * Password::hash
-     *
-     * Hash a password.
-     *
-     * @param string $password Password to be encrypted.
-     * @param string $salt     To manually provide a salt to use when hashing the password.
-     *
-     * @return string
-     */
-    public function hash ( $password, $salt = null )
-    {
-        return password_hash( $this->protect( $password, $salt ), $this->algorithm, $this->options );
     }
 
     // ------------------------------------------------------------------------
@@ -167,7 +113,7 @@ class Password
      *
      * @return string|bool Returns FALSE if the password not verified.
      */
-    public function rehash ( $password, $hash, $salt = null )
+    public function rehash( $password, $hash, $salt = null )
     {
         if ( $this->verify( $password, $hash, $salt ) ) {
 
@@ -204,8 +150,62 @@ class Password
      *
      * @return string
      */
-    public function verify ( $password, $hash, $salt = null )
+    public function verify( $password, $hash, $salt = null )
     {
         return password_verify( $this->protect( $password, $salt ), $hash );
+    }
+
+    // ------------------------------------------------------------------------
+
+    /**
+     * Password::protect
+     *
+     * Protect a password.
+     *
+     * @param string $password Password to be encrypted.
+     * @param string $salt     To manually provide a salt to use when hashing the password.
+     *
+     * @return string
+     */
+    protected function protect( $password, $salt = null )
+    {
+        $salt = isset( $salt )
+            ? $salt
+            : $this->salt;
+
+        return $password . $salt;
+    }
+
+    // ------------------------------------------------------------------------
+
+    /**
+     * Password::hash
+     *
+     * Hash a password.
+     *
+     * @param string $password Password to be encrypted.
+     * @param string $salt     To manually provide a salt to use when hashing the password.
+     *
+     * @return string
+     */
+    public function hash( $password, $salt = null )
+    {
+        return password_hash( $this->protect( $password, $salt ), $this->algorithm, $this->options );
+    }
+
+    // ------------------------------------------------------------------------
+
+    /**
+     * Password::setSalt
+     *
+     * @param string $salt Encryption key.
+     *
+     * @return static
+     */
+    protected function setSalt( $salt )
+    {
+        $this->salt = md5( $salt, true );
+
+        return $this;
     }
 }

@@ -22,6 +22,12 @@ namespace O2System\Security\Encryptions;
 class Binary
 {
     /**
+     * Binary::$charactersMap
+     *
+     * @var array
+     */
+    private static $charactersMap = [];
+    /**
      * Binary::$crypt
      *
      * Crypt instance.
@@ -29,20 +35,13 @@ class Binary
      * @var Crypt
      */
     private $crypt;
-    
-    /**
-     * Binary::$charactersMap
-     *
-     * @var array
-     */
-    private static $charactersMap = [ ];
 
     // ------------------------------------------------------------------------
 
     /**
      * Binary::__construct
      */
-    public function __construct ()
+    public function __construct()
     {
         $this->crypt = new Crypt();
 
@@ -148,24 +147,6 @@ class Binary
     // ------------------------------------------------------------------------
 
     /**
-     * Binary::setKey
-     *
-     * Sets numeric encryption protection key.
-     *
-     * @param string $key Custom encryption key.
-     *
-     * @return static
-     */
-    protected function setKey ( $key )
-    {
-        $this->crypt->setKey( $key );
-
-        return $this;
-    }
-
-    // ------------------------------------------------------------------------
-
-    /**
      * Binary::encrypt
      *
      * Encrypt string into numbers.
@@ -174,9 +155,9 @@ class Binary
      *
      * @return string
      */
-    public function encrypt ( $string )
+    public function encrypt( $string )
     {
-        $numbers = [ ];
+        $numbers = [];
         $letters = str_split( $this->crypt->encrypt( $string ) );
 
         $i = 0;
@@ -207,9 +188,9 @@ class Binary
      *
      * @return string
      */
-    public function decrypt ( $numbers )
+    public function decrypt( $numbers )
     {
-        $letters = [ ];
+        $letters = [];
         $numbers = explode( ' ', str_replace( PHP_EOL, '', $numbers ) );
 
         foreach ( $numbers as $number ) {
@@ -219,5 +200,23 @@ class Binary
         }
 
         return $this->crypt->decrypt( implode( '', $letters ) );
+    }
+
+    // ------------------------------------------------------------------------
+
+    /**
+     * Binary::setKey
+     *
+     * Sets numeric encryption protection key.
+     *
+     * @param string $key Custom encryption key.
+     *
+     * @return static
+     */
+    protected function setKey( $key )
+    {
+        $this->crypt->setKey( $key );
+
+        return $this;
     }
 }

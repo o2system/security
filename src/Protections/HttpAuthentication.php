@@ -73,17 +73,17 @@ class HttpAuthentication
      *
      * @var array
      */
-    private $users = [ ];
+    private $users = [];
 
     // ------------------------------------------------------------------------
 
     /**
      * HttpAuthentication::__construct
      */
-    public function __construct ( $realm, $type = HttpAuthentication::AUTH_BASIC )
+    public function __construct( $realm, $type = HttpAuthentication::AUTH_BASIC )
     {
         $this->setRealm( $realm )
-             ->setType( $type );
+            ->setType( $type );
 
         if ( class_exists( '\O2System\Framework' ) ) {
             if ( $security = config()->getItem( 'security' ) ) {
@@ -99,24 +99,6 @@ class HttpAuthentication
     // ------------------------------------------------------------------------
 
     /**
-     * HttpAuthentication::setRealm
-     *
-     * Sets WWW-Authenticate Realm
-     *
-     * @param string $realm WWW-Authenticate Realm.
-     *
-     * @return static
-     */
-    public function setRealm ( $realm )
-    {
-        $this->realm = trim( $realm );
-
-        return $this;
-    }
-
-    // ------------------------------------------------------------------------
-
-    /**
      * HttpAuthentication::setType
      *
      * Sets WWW-Authenticate Type
@@ -125,11 +107,29 @@ class HttpAuthentication
      *
      * @return static
      */
-    public function setType ( $type )
+    public function setType( $type )
     {
         if ( in_array( $type, [ self::AUTH_BASIC, self::AUTH_DIGEST ] ) ) {
             $this->type = $type;
         }
+
+        return $this;
+    }
+
+    // ------------------------------------------------------------------------
+
+    /**
+     * HttpAuthentication::setRealm
+     *
+     * Sets WWW-Authenticate Realm
+     *
+     * @param string $realm WWW-Authenticate Realm.
+     *
+     * @return static
+     */
+    public function setRealm( $realm )
+    {
+        $this->realm = trim( $realm );
 
         return $this;
     }
@@ -145,7 +145,7 @@ class HttpAuthentication
      *
      * @return static
      */
-    public function setUsers ( array $users )
+    public function setUsers( array $users )
     {
         $this->users = $users;
 
@@ -163,56 +163,11 @@ class HttpAuthentication
      *
      * @return static
      */
-    public function setUsersValidation ( \Closure $closure )
+    public function setUsersValidation( \Closure $closure )
     {
         $this->validation = $closure;
 
         return $this;
-    }
-
-    // ------------------------------------------------------------------------
-
-    /**
-     * HttpAuthentication::login
-     *
-     * Perform WWW-Authenticate Login.
-     *
-     * @param string $username Authentication username.
-     * @param string $password Authentication password.
-     *
-     * @return bool|string
-     */
-    public function login ( $username, $password = null )
-    {
-        switch ( $this->type ) {
-            default:
-            case self::AUTH_BASIC:
-                if ( isset( $username ) AND isset( $password ) ) {
-                    if ( $this->validation instanceof \Closure ) {
-                        return call_user_func_array( $this->validation, func_get_args() );
-                    } else {
-                        if ( array_key_exists( $username, $this->users ) ) {
-                            if ( $this->users[ $username ] === $password ) {
-                                return true;
-                            }
-                        }
-                    }
-                }
-                break;
-            case self::AUTH_DIGEST:
-                if ( isset( $username ) ) {
-                    if ( $this->validation instanceof \Closure ) {
-                        return call_user_func_array( $this->validation, func_get_args() );
-                    } else {
-                        if ( array_key_exists( $username, $this->users ) ) {
-                            return $this->users[ $username ];
-                        }
-                    }
-                }
-                break;
-        }
-
-        return false;
     }
 
     // ------------------------------------------------------------------------
@@ -224,7 +179,7 @@ class HttpAuthentication
      *
      * @return bool
      */
-    public function verify ()
+    public function verify()
     {
         switch ( $this->type ) {
             default:
@@ -258,7 +213,7 @@ class HttpAuthentication
                 }
 
                 if ( isset( $authentication ) AND
-                     false !== ( $password = $this->login( $authentication[ 'username' ] ) )
+                    false !== ( $password = $this->login( $authentication[ 'username' ] ) )
                 ) {
                     $A1 = md5( $authentication[ 'username' ] . ':' . $this->realm . ':' . $password );
                     $A2 = md5( $_SERVER[ 'REQUEST_METHOD' ] . ':' . $authentication[ 'uri' ] );
@@ -308,18 +263,90 @@ class HttpAuthentication
     // ------------------------------------------------------------------------
 
     /**
+     * HttpAuthentication::login
+     *
+     * Perform WWW-Authenticate Login.
+     *
+     * @param string $username Authentication username.
+     * @param string $password Authentication password.
+     *
+     * @return bool|string
+     */
+    public function login( $username, $password = null )
+    {
+        switch ( $this->type ) {
+            default:
+            case self::AUTH_BASIC:
+                if ( isset( $username ) AND isset( $password ) ) {
+                    if ( $this->validation instanceof \Closure ) {
+                        return call_user_func_array( $this->validation, func_get_args() );
+                    } else {
+                        if ( array_key_exists( $username, $this->users ) ) {
+                            if ( $this->users[ $username ] === $password ) {
+                                return true;
+                            }
+                        }
+                    }
+                }
+                break;
+            case self::AUTH_DIGEST:
+                if ( isset( $username ) ) {
+                    if ( $this->validation instanceof \Closure ) {
+                        return call_user_func_array( $this->validation, func_get_args() );
+                    } else {
+                        if ( array_key_exists( $username, $this->users ) ) {
+                            return $this->users[ $username ];
+                        }
+                    }
+                }
+                break;
+        }
+
+        return false;
+    }
+
+    // ------------------------------------------------------------------------
+
+    /**
      * HttpAuthentication::parseBasic
      *
      * Parse Basic Realm HTTP Authentication data.
      *
      * @return array Basic Realm HTTP Authentication data.
      */
-    protected function parseBasic ()
+    protected function parseBasic()
     {
         return [
             'username' => input()->server( 'PHP_AUTH_USER' ),
             'password' => input()->server( 'PHP_AUTH_PW' ),
         ];
+    }
+
+    // ------------------------------------------------------------------------
+
+    /**
+     * HttpAuthentication::protect
+     *
+     * Protect requested page with HTTP Authorization form dialog.
+     *
+     * @return void
+     */
+    protected function protect()
+    {
+        header( 'HTTP/1.1 401 Unauthorized' );
+
+        switch ( $this->type ) {
+            default:
+            case self::AUTH_BASIC:
+                header( 'WWW-Authenticate: Basic realm="' . $this->realm . '"' );
+                break;
+            case self::AUTH_DIGEST:
+                header(
+                    'WWW-Authenticate: Digest realm="' . $this->realm .
+                    '", qop="auth", nonce="' . md5( uniqid() ) . '", opaque="' . md5( uniqid() ) . '"'
+                );
+                break;
+        }
     }
 
     // ------------------------------------------------------------------------
@@ -333,7 +360,7 @@ class HttpAuthentication
      *
      * @return array Digest HTTP Authentication data.
      */
-    protected function parseDigest ( $digest )
+    protected function parseDigest( $digest )
     {
         $digest = str_replace( 'Digest ', '', $digest );
         $digest = trim( $digest );
@@ -341,7 +368,7 @@ class HttpAuthentication
         $parts = explode( ',', $digest );
         $parts = array_map( 'trim', $parts );
 
-        $data = [ ];
+        $data = [];
         foreach ( $parts as $part ) {
             $elements = explode( '=', $part );
             $elements = array_map(
@@ -358,32 +385,5 @@ class HttpAuthentication
         return empty( $data )
             ? false
             : $data;
-    }
-
-    // ------------------------------------------------------------------------
-
-    /**
-     * HttpAuthentication::protect
-     *
-     * Protect requested page with HTTP Authorization form dialog.
-     *
-     * @return void
-     */
-    protected function protect ()
-    {
-        header( 'HTTP/1.1 401 Unauthorized' );
-
-        switch ( $this->type ) {
-            default:
-            case self::AUTH_BASIC:
-                header( 'WWW-Authenticate: Basic realm="' . $this->realm . '"' );
-                break;
-            case self::AUTH_DIGEST:
-                header(
-                    'WWW-Authenticate: Digest realm="' . $this->realm .
-                    '", qop="auth", nonce="' . md5( uniqid() ) . '", opaque="' . md5( uniqid() ) . '"'
-                );
-                break;
-        }
     }
 }

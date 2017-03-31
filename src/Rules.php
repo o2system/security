@@ -12,10 +12,10 @@
 
 namespace O2System\Security;
 
+use O2System\Security\Filters\Validation;
 use O2System\Spl\Exceptions\Logic\BadFunctionCall\BadMethodCallException;
 use O2System\Spl\Exceptions\Logic\InvalidArgumentException;
 use O2System\Spl\Exceptions\Logic\OutOfRangeException;
-use O2System\Security\Filters\Validation;
 
 /**
  * Class Rules
@@ -30,7 +30,7 @@ class Rules
      * @access  protected
      * @type    array
      */
-    protected $rules = [ ];
+    protected $rules = [];
 
     /**
      * Validation Errors
@@ -38,7 +38,7 @@ class Rules
      * @access  protected
      * @type    array
      */
-    protected $errors = [ ];
+    protected $errors = [];
 
     /**
      * Validation Messages
@@ -46,7 +46,7 @@ class Rules
      * @access  protected
      * @type    array
      */
-    protected $customErrors = [ ];
+    protected $customErrors = [];
 
     /**
      * Source Variables
@@ -54,11 +54,11 @@ class Rules
      * @access  protected
      * @type    array
      */
-    protected $sourceVars = [ ];
+    protected $sourceVars = [];
 
     // ------------------------------------------------------------------------
 
-    public function __construct ( $sourceVars = [ ] )
+    public function __construct( $sourceVars = [] )
     {
         $this->customErrors = [
             'required'  => ':attribute is required',
@@ -85,7 +85,7 @@ class Rules
      *
      * @access  public
      */
-    public function setSource ( array $sourceVars )
+    public function setSource( array $sourceVars )
     {
         $this->sourceVars = $sourceVars;
     }
@@ -98,7 +98,7 @@ class Rules
      * @param string $key
      * @param string $value
      */
-    public function addSource ( $key, $value )
+    public function addSource( $key, $value )
     {
         $this->sourceVars[ $key ] = $value;
     }
@@ -110,7 +110,7 @@ class Rules
      *
      * @param array $rules
      */
-    public function addRules ( array $rules )
+    public function addRules( array $rules )
     {
         foreach ( $rules as $rule ) {
             $this->addRule( $rule[ 'field' ], $rule[ 'label' ], $rule[ 'rules' ], $rule[ 'messages' ] );
@@ -127,7 +127,7 @@ class Rules
      * @param       $rules
      * @param array $messages
      */
-    public function addRule ( $field, $label, $rules, $messages = [ ] )
+    public function addRule( $field, $label, $rules, $messages = [] )
     {
         $this->rules[ $field ] = [
             'field'    => $field,
@@ -146,7 +146,7 @@ class Rules
      *
      * @return bool
      */
-    public function hasRule ( $field )
+    public function hasRule( $field )
     {
         if ( array_key_exists( $field, $this->rules ) ) {
             return true;
@@ -163,14 +163,14 @@ class Rules
      * @param $field
      * @param $message
      */
-    public function setMessage ( $field, $message )
+    public function setMessage( $field, $message )
     {
         $this->customErrors[ $field ] = $message;
     }
 
     // ------------------------------------------------------------------------
 
-    public function validate ()
+    public function validate()
     {
         /* Check if data source is existed or not */
         if ( count( $this->sourceVars ) < 1 OR empty( $this->sourceVars ) ) {
@@ -214,7 +214,7 @@ class Rules
                         $methodParams = array_merge( $methodParams, $ruleParams );
                     }
 
-                    $method = 'is' . studlycapcase( $method );
+                    $method = 'is' . studlycase( $method );
 
                     /* Throw exception if method not exists in validation class */
                     if ( ! method_exists( $validationClass, $method ) ) {
@@ -270,7 +270,7 @@ class Rules
      * @param       $error
      * @param array $vars
      */
-    protected function setError ( $error, $vars = [ ] )
+    protected function setError( $error, $vars = [] )
     {
         if ( array_key_exists( $error, $this->customErrors ) ) {
             $error = $this->customErrors[ $error ];
@@ -294,7 +294,7 @@ class Rules
      *
      * @return array
      */
-    public function getErrors ()
+    public function getErrors()
     {
         return $this->errors;
     }

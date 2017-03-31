@@ -17,13 +17,13 @@ use O2System\Security\Access\Datastructures\UserData;
 
 interface RegisterModelInterface
 {
-    public function insertRegistrationData ( UserData $userdata );
+    public function insertRegistrationData( UserData $userdata );
 
-    public function updateRegistrationData ( UserData $userdata );
+    public function updateRegistrationData( UserData $userdata );
 
-    public function isUsernameExists ( $username );
+    public function isUsernameExists( $username );
 
-    public function isEmailExists ( $email );
+    public function isEmailExists( $email );
 
-    public function isMsisdnExists ( $msisdn );
+    public function isMsisdnExists( $msisdn );
 }

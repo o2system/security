@@ -37,7 +37,7 @@ class Firewall
      *
      * @var array
      */
-    protected $whitelistIpAddresses = [ ];
+    protected $whitelistIpAddresses = [];
 
     /**
      * Firewall::$blacklist
@@ -46,7 +46,7 @@ class Firewall
      *
      * @var array
      */
-    protected $blacklistIpAddresses = [ ];
+    protected $blacklistIpAddresses = [];
 
     // ------------------------------------------------------------------------
 
@@ -59,7 +59,7 @@ class Firewall
      *
      * @return static
      */
-    public function setIpVersion ( $ipVersion )
+    public function setIpVersion( $ipVersion )
     {
         if ( in_array( $ipVersion, [ FILTER_FLAG_IPV4, FILTER_FLAG_IPV6 ] ) ) {
             $this->ipVersion = $ipVersion;
@@ -79,7 +79,7 @@ class Firewall
      *
      * @return static
      */
-    public function setWhitelistIpAddresses ( array $ipAddresses )
+    public function setWhitelistIpAddresses( array $ipAddresses )
     {
         foreach ( $ipAddresses as $ipAddress ) {
             if ( $this->isValid( $ipAddress ) ) {
@@ -93,6 +93,22 @@ class Firewall
     // ------------------------------------------------------------------------
 
     /**
+     * Firewall::isValid
+     *
+     * Checks if the ip address is valid.
+     *
+     * @param string $ipAddress Ip Address.
+     *
+     * @return mixed
+     */
+    protected function isValid( $ipAddress )
+    {
+        return filter_var( $ipAddress, FILTER_FLAG_IPV4 );
+    }
+
+    // ------------------------------------------------------------------------
+
+    /**
      * Firewall::addWhitelistIpAddress
      *
      * Sets whitelist ip addresses.
@@ -101,33 +117,13 @@ class Firewall
      *
      * @return static
      */
-    public function addWhitelistIpAddress ( $ipAddress )
+    public function addWhitelistIpAddress( $ipAddress )
     {
         if ( $this->isValid( $ipAddress ) ) {
             $this->whitelistIpAddresses[] = $ipAddress;
         }
 
         return $this;
-    }
-
-    // ------------------------------------------------------------------------
-
-    /**
-     * Firewall::isWhitelisted
-     *
-     * Checks if the client ip address is whitelisted.
-     *
-     * @param string $ipAddress Client ip address.
-     *
-     * @return bool
-     */
-    public function isWhitelisted ( $ipAddress )
-    {
-        if ( $this->isValid( $ipAddress ) ) {
-            return (bool) in_array( $ipAddress, $this->whitelistIpAddresses );
-        }
-
-        return false;
     }
 
     // ------------------------------------------------------------------------
@@ -141,7 +137,7 @@ class Firewall
      *
      * @return static
      */
-    public function setBlacklistIpAddresses ( array $ipAddresses )
+    public function setBlacklistIpAddresses( array $ipAddresses )
     {
         foreach ( $ipAddresses as $ipAddress ) {
             if ( $this->isValid( $ipAddress ) ) {
@@ -163,13 +159,57 @@ class Firewall
      *
      * @return static
      */
-    public function addBlacklistIpAddress ( $ipAddress )
+    public function addBlacklistIpAddress( $ipAddress )
     {
         if ( $this->isValid( $ipAddress ) ) {
             $this->whitelistIpAddresses[] = $ipAddress;
         }
 
         return $this;
+    }
+
+    // ------------------------------------------------------------------------
+
+    /**
+     * Firewall::verify
+     *
+     * @param string $ipAddress
+     *
+     * @return bool
+     */
+    public function verify( $ipAddress = null )
+    {
+        $ipAddress = isset( $ipAddress )
+            ? $ipAddress
+            : input()->ipAddress();
+
+        if ( $this->isWhitelisted( $ipAddress ) OR
+            $this->isBlacklisted( $ipAddress ) === false
+        ) {
+            return true;
+        }
+
+        return false;
+    }
+
+    // ------------------------------------------------------------------------
+
+    /**
+     * Firewall::isWhitelisted
+     *
+     * Checks if the client ip address is whitelisted.
+     *
+     * @param string $ipAddress Client ip address.
+     *
+     * @return bool
+     */
+    public function isWhitelisted( $ipAddress )
+    {
+        if ( $this->isValid( $ipAddress ) ) {
+            return (bool)in_array( $ipAddress, $this->whitelistIpAddresses );
+        }
+
+        return false;
     }
 
     // ------------------------------------------------------------------------
@@ -183,50 +223,10 @@ class Firewall
      *
      * @return bool
      */
-    public function isBlacklisted ( $ipAddress )
+    public function isBlacklisted( $ipAddress )
     {
         if ( $this->isValid( $ipAddress ) ) {
-            return (bool) in_array( $ipAddress, $this->whitelistIpAddresses );
-        }
-
-        return false;
-    }
-
-    // ------------------------------------------------------------------------
-
-    /**
-     * Firewall::isValid
-     *
-     * Checks if the ip address is valid.
-     *
-     * @param string $ipAddress Ip Address.
-     *
-     * @return mixed
-     */
-    protected function isValid ( $ipAddress )
-    {
-        return filter_var( $ipAddress, FILTER_FLAG_IPV4 );
-    }
-
-    // ------------------------------------------------------------------------
-
-    /**
-     * Firewall::verify
-     *
-     * @param string $ipAddress
-     *
-     * @return bool
-     */
-    public function verify ( $ipAddress = null )
-    {
-        $ipAddress = isset( $ipAddress )
-            ? $ipAddress
-            : input()->ipAddress();
-
-        if ( $this->isWhitelisted( $ipAddress ) OR
-             $this->isBlacklisted( $ipAddress ) === false
-        ) {
-            return true;
+            return (bool)in_array( $ipAddress, $this->whitelistIpAddresses );
         }
 
         return false;

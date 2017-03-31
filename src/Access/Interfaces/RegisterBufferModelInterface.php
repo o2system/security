@@ -17,7 +17,7 @@ use O2System\Security\Access\Datastructures\UserData;
 
 interface RegisterBufferModelInterface extends RegisterModelInterface
 {
-    public function insertRegistrationBufferData ( UserData $userdata );
+    public function insertRegistrationBufferData( UserData $userdata );
 
-    public function updateRegistrationBufferData ( UserData $userdata );
+    public function updateRegistrationBufferData( UserData $userdata );
 }

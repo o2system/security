@@ -23,7 +23,7 @@ class Csrf
 {
     /**
      * Csrf::$token
-     * 
+     *
      * Active CSRF protection token.
      *
      * @var string
@@ -35,7 +35,7 @@ class Csrf
     /**
      * Csrf::__construct
      */
-    public function __construct ()
+    public function __construct()
     {
         if ( false === ( $this->token = $this->getToken() ) ) {
             $this->regenerate();
@@ -51,7 +51,7 @@ class Csrf
      *
      * @return string|bool Returns FALSE if CSRF protection token is not set.
      */
-    public function getToken ()
+    public function getToken()
     {
         if ( isset( $_SESSION[ 'csrfToken' ] ) ) {
             return $_SESSION[ 'csrfToken' ];
@@ -69,7 +69,7 @@ class Csrf
      *
      * @return void
      */
-    public function regenerate ()
+    public function regenerate()
     {
         $_SESSION[ 'csrfToken' ] = $this->token = md5( uniqid( mt_rand(), true ) . 'CSRF' );
     }
@@ -85,7 +85,7 @@ class Csrf
      *
      * @return bool
      */
-    public function verify ( $token = null )
+    public function verify( $token = null )
     {
         $token = isset( $token )
             ? $token

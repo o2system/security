@@ -21,7 +21,7 @@ class Xss
 {
     /**
      * Xss::$token
-     * 
+     *
      * Active XSS protection token.
      *
      * @var string
@@ -33,7 +33,7 @@ class Xss
     /**
      * Xss::__construct
      */
-    public function __construct ()
+    public function __construct()
     {
         $this->config = require( str_replace( 'Protections', 'Config', __DIR__ ) . DIRECTORY_SEPARATOR . 'Xss.php' );
 
@@ -51,7 +51,7 @@ class Xss
      *
      * @return string|bool Returns FALSE if XSS protection token is not set.
      */
-    public function getToken ()
+    public function getToken()
     {
         if ( isset( $_SESSION[ 'xssToken' ] ) ) {
             return $_SESSION[ 'xssToken' ];
@@ -69,7 +69,7 @@ class Xss
      *
      * @return void
      */
-    public function regenerate ()
+    public function regenerate()
     {
         $_SESSION[ 'xssToken' ] = $this->token = md5( uniqid( mt_rand(), true ) . 'XSS' );
     }
@@ -85,7 +85,7 @@ class Xss
      *
      * @return bool
      */
-    public function verify ( $token = null )
+    public function verify( $token = null )
     {
         $token = isset( $token )
             ? $token
@@ -108,7 +108,7 @@ class Xss
      *
      * @return string
      */
-    public function clean ( $string, $is_image = false )
+    public function clean( $string, $is_image = false )
     {
         // Is the string an array?
         if ( is_array( $string ) ) {
@@ -269,25 +269,25 @@ class Xss
          * Becomes: &lt;blink&gt;
          */
         $pattern = '#'
-                   . '<((?<slash>/*\s*)(?<tagName>[a-z0-9]+)(?=[^a-z0-9]|$)'
-                   // tag start and name, followed by a non-tag character
-                   . '[^\s\042\047a-z0-9>/=]*'
-                   // a valid attribute character immediately after the tag would count as a separator
-                   // optional attributes
-                   . '(?<attributes>(?:[\s\042\047/=]*'
-                   // non-attribute characters, excluding > (tag close) for obvious reasons
-                   . '[^\s\042\047>/=]+'
-                   // attribute characters
-                   // optional attribute-value
-                   . '(?:\s*='
-                   // attribute-value separator
-                   . '(?:[^\s\042\047=><`]+|\s*\042[^\042]*\042|\s*\047[^\047]*\047|\s*(?U:[^\s\042\047=><`]*))'
-                   // single, double or non-quoted value
-                   . ')?'
-                   // end optional attribute-value group
-                   . ')*)'
-                   // end optional attributes group
-                   . '[^>]*)(?<closeTag>\>)?#isS';
+            . '<((?<slash>/*\s*)(?<tagName>[a-z0-9]+)(?=[^a-z0-9]|$)'
+            // tag start and name, followed by a non-tag character
+            . '[^\s\042\047a-z0-9>/=]*'
+            // a valid attribute character immediately after the tag would count as a separator
+            // optional attributes
+            . '(?<attributes>(?:[\s\042\047/=]*'
+            // non-attribute characters, excluding > (tag close) for obvious reasons
+            . '[^\s\042\047>/=]+'
+            // attribute characters
+            // optional attribute-value
+            . '(?:\s*='
+            // attribute-value separator
+            . '(?:[^\s\042\047=><`]+|\s*\042[^\042]*\042|\s*\047[^\047]*\047|\s*(?U:[^\s\042\047=><`]*))'
+            // single, double or non-quoted value
+            . ')?'
+            // end optional attribute-value group
+            . ')*)'
+            // end optional attributes group
+            . '[^>]*)(?<closeTag>\>)?#isS';
         // Note: It would be nice to optimize this for speed, BUT
         //       only matching the naughty elements here results in
         //       false positives and in turn - vulnerabilities!
@@ -348,7 +348,7 @@ class Xss
      *
      * @return    string
      */
-    protected function doNeverAllowed ( $string )
+    protected function doNeverAllowed( $string )
     {
         $string = str_replace(
             array_keys( $this->config[ 'never_allowed_strings' ] ),
@@ -377,7 +377,7 @@ class Xss
      *
      * @return    string
      */
-    protected function compactExplodedWords ( $matches )
+    protected function compactExplodedWords( $matches )
     {
         return preg_replace( '/\s+/s', '', $matches[ 1 ] ) . $matches[ 2 ];
     }
@@ -395,7 +395,7 @@ class Xss
      *
      * @return    string
      */
-    protected function sanitizeNaughtyHTML ( $matches )
+    protected function sanitizeNaughtyHTML( $matches )
     {
         // First, escape unclosed tags
         if ( empty( $matches[ 'closeTag' ] ) ) {
@@ -406,16 +406,16 @@ class Xss
         } // For other tags, see if their attributes are "evil" and strip those
         elseif ( isset( $matches[ 'attributes' ] ) ) {
             // We'll store the already fitlered attributes here
-            $attributes = [ ];
+            $attributes = [];
 
             // Attribute-catching pattern
             $attributes_pattern = '#'
-                                  . '(?<name>[^\s\042\047>/=]+)'
-                                  // attribute characters
-                                  // optional attribute-value
-                                  . '(?:\s*=(?<value>[^\s\042\047=><`]+|\s*\042[^\042]*\042|\s*\047[^\047]*\047|\s*(?U:[^\s\042\047=><`]*)))'
-                                  // attribute-value separator
-                                  . '#i';
+                . '(?<name>[^\s\042\047>/=]+)'
+                // attribute characters
+                // optional attribute-value
+                . '(?:\s*=(?<value>[^\s\042\047=><`]+|\s*\042[^\042]*\042|\s*\047[^\047]*\047|\s*(?U:[^\s\042\047=><`]*)))'
+                // attribute-value separator
+                . '#i';
 
             // Blacklist pattern for evil attribute names
             $is_evil_pattern = '#^(' . implode( '|', $this->config[ 'evil_attributes' ] ) . ')$#i';
@@ -475,7 +475,7 @@ class Xss
      *
      * @return    string
      */
-    protected function jsLinkRemoval ( $match )
+    protected function jsLinkRemoval( $match )
     {
         return str_replace(
             $match[ 1 ],
@@ -502,7 +502,7 @@ class Xss
      *
      * @return    string
      */
-    protected function filterAttributes ( $str )
+    protected function filterAttributes( $str )
     {
         $out = '';
         if ( preg_match_all( '#\s*[a-z\-]+\s*=\s*(\042|\047)([^\\1]*?)\\1#is', $str, $matches ) ) {
@@ -531,7 +531,7 @@ class Xss
      *
      * @return    string
      */
-    protected function jsImgRemoval ( $match )
+    protected function jsImgRemoval( $match )
     {
         return str_replace(
             $match[ 1 ],
@@ -555,7 +555,7 @@ class Xss
      *
      * @return    string
      */
-    protected function convertAttribute ( $match )
+    protected function convertAttribute( $match )
     {
         return str_replace( [ '>', '<', '\\' ], [ '&gt;', '&lt;', '\\\\' ], $match[ 0 ] );
     }
@@ -571,7 +571,7 @@ class Xss
      *
      * @return    string
      */
-    protected function decodeEntity ( $match )
+    protected function decodeEntity( $match )
     {
         // Protect GET variables in URLs
         // 901119URL5918AMP18930PROTECT8198
@@ -605,7 +605,7 @@ class Xss
      *
      * @return    string
      */
-    protected function entityDecode ( $string, $charset = null )
+    protected function entityDecode( $string, $charset = null )
     {
         if ( strpos( $string, '&' ) === false ) {
             return $string;
@@ -628,7 +628,7 @@ class Xss
                     );
                 }
 
-                $replace = [ ];
+                $replace = [];
                 $matches = array_unique( array_map( 'strtolower', $matches[ 0 ] ) );
                 for ( $i = 0; $i < $c; $i++ ) {
                     if ( ( $char = array_search( $matches[ $i ] . ';', $_entities, true ) ) !== false ) {

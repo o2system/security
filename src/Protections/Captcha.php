@@ -36,7 +36,7 @@ class Captcha
     /**
      * Captcha::__construct
      */
-    public function __construct ()
+    public function __construct()
     {
         if ( false === ( $this->token = $this->getToken() ) ) {
             $this->regenerate();
@@ -52,13 +52,40 @@ class Captcha
      *
      * @return string|bool Returns FALSE if not set.
      */
-    protected function getToken ()
+    protected function getToken()
     {
         if ( isset( $_SESSION[ 'captchaToken' ] ) ) {
             return $_SESSION[ 'captchaToken' ];
         }
 
         return false;
+    }
+
+    // ------------------------------------------------------------------------
+
+    /**
+     * Captcha::regenerate
+     *
+     * Regenerate CAPTCHA protection token.
+     *
+     * @return string Base64 image string.
+     */
+    public function regenerate()
+    {
+        $_SESSION[ 'captchaToken' ] = $this->token = strtoupper(
+            substr(
+                md5(
+                    uniqid(
+                        mt_rand(),
+                        true
+                    ) . 'CAPTCHA'
+                ),
+                2,
+                6
+            )
+        );
+
+        return $this->getImage();
     }
 
     // ------------------------------------------------------------------------
@@ -71,7 +98,7 @@ class Captcha
      * @return string Base64 image string.
      * @throws \O2System\Spl\Exceptions\RuntimeException
      */
-    public function getImage ()
+    public function getImage()
     {
         $tempFilePath = tempnam(
             sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'o2system' . DIRECTORY_SEPARATOR,
@@ -114,33 +141,6 @@ class Captcha
     // ------------------------------------------------------------------------
 
     /**
-     * Captcha::regenerate
-     *
-     * Regenerate CAPTCHA protection token.
-     *
-     * @return string Base64 image string.
-     */
-    public function regenerate ()
-    {
-        $_SESSION[ 'captchaToken' ] = $this->token = strtoupper(
-            substr(
-                md5(
-                    uniqid(
-                        mt_rand(),
-                        true
-                    ) . 'CAPTCHA'
-                ),
-                2,
-                6
-            )
-        );
-
-        return $this->getImage();
-    }
-
-    // ------------------------------------------------------------------------
-
-    /**
      * Captcha::isValid
      *
      * Checks if the posted CAPTCHA protection token is valid.
@@ -149,7 +149,7 @@ class Captcha
      *
      * @return bool
      */
-    public function isValid ( $token = null )
+    public function isValid( $token = null )
     {
         $token = isset( $token )
             ? $token

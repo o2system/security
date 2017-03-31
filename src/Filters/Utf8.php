@@ -76,12 +76,12 @@ class Utf8
      *
      * @access  public
      */
-    public function __construct ()
+    public function __construct()
     {
         if (
             defined( 'PREG_BAD_UTF8_ERROR' )                // PCRE must support UTF-8
             AND ( ICONV_ENABLED === true || MB_ENABLED === true )    // iconv or mbstring must be installed
-                AND strtoupper( o2system()->config[ 'charset' ] ) === 'UTF-8'    // Application charset must be UTF-8
+            AND strtoupper( o2system()->config[ 'charset' ] ) === 'UTF-8'    // Application charset must be UTF-8
         ) {
             $this->isEnabled = true;
             logger()->debug( 'LOG_DEBUG_UTF8_SUPPORT_ENABLED' );
@@ -95,9 +95,9 @@ class Utf8
 
     // --------------------------------------------------------------------
 
-    public function isEnabled ()
+    public function isEnabled()
     {
-        return (bool) $this->isEnabled;
+        return (bool)$this->isEnabled;
     }
 
     /**
@@ -109,7 +109,7 @@ class Utf8
      *
      * @return    string
      */
-    public function cleanString ( $string )
+    public function cleanString( $string )
     {
         if ( $this->isAscii( $string ) === false ) {
             if ( MB_ENABLED ) {
@@ -133,7 +133,7 @@ class Utf8
      *
      * @return    bool
      */
-    public function isAscii ( $string )
+    public function isAscii( $string )
     {
         return ( preg_match( '/[^\x00-\x7F]/S', $string ) === 0 );
     }
@@ -151,7 +151,7 @@ class Utf8
      *
      * @return    string
      */
-    public function safeAsciiForXML ( $string )
+    public function safeAsciiForXML( $string )
     {
         return remove_invisible_characters( $string, false );
     }
@@ -168,7 +168,7 @@ class Utf8
      *
      * @return    string    $str encoded in UTF-8 or FALSE on failure
      */
-    public function convertString ( $string, $encoding )
+    public function convertString( $string, $encoding )
     {
         if ( MB_ENABLED ) {
             return mb_convert_encoding( $string, 'UTF-8', $encoding );

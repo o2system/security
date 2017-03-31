@@ -17,7 +17,7 @@ use O2System\Spl\Datastructures\SplArrayObject;
 
 class UserData extends SplArrayObject
 {
-    public function __construct ( array $userdata = [ ] )
+    public function __construct( array $userdata = [] )
     {
         parent::__construct(
             array_merge(
@@ -33,13 +33,13 @@ class UserData extends SplArrayObject
         );
 
         if ( null !== ( $username = $this->offsetGet( 'username' ) ) and
-             null !== ( $password = $this->offsetGet( 'username' ) )
+            null !== ( $password = $this->offsetGet( 'username' ) )
         ) {
             $this->getSalt( $username, $password );
         }
     }
 
-    public function getSalt ( $username, $password )
+    public function getSalt( $username, $password )
     {
 
     }

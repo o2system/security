@@ -37,14 +37,14 @@ class Cookie
      *
      * @var array
      */
-    private $options = [ ];
+    private $options = [];
 
     // ------------------------------------------------------------------------
 
     /**
      * Cookie::__construct
      */
-    public function __construct ()
+    public function __construct()
     {
         $this->crypt = new Crypt();
 
@@ -72,24 +72,6 @@ class Cookie
     // ------------------------------------------------------------------------
 
     /**
-     * Cookie::setKey
-     *
-     * Sets cookie encryption protection key.
-     *
-     * @param string $key Custom encryption key.
-     *
-     * @return static
-     */
-    protected function setKey ( $key )
-    {
-        $this->crypt->setKey( $key );
-
-        return $this;
-    }
-
-    // ------------------------------------------------------------------------
-
-    /**
      * Cookie::setOptions
      *
      * Sets default cookie options.
@@ -98,7 +80,7 @@ class Cookie
      *
      * @return static
      */
-    public function setOptions ( array $options )
+    public function setOptions( array $options )
     {
         foreach ( $options as $key => $value ) {
             if ( array_key_exists( $key, $this->options ) ) {
@@ -121,7 +103,7 @@ class Cookie
      *
      * @return bool
      */
-    public function encrypt ( $name, $value )
+    public function encrypt( $name, $value )
     {
         $value = is_array( $value ) || is_object( $value )
             ? serialize( $value )
@@ -155,7 +137,7 @@ class Cookie
      *
      * @return string|bool Returns FALSE if cookie is not exists or the decryption failure.
      */
-    public function decrypt ( $name )
+    public function decrypt( $name )
     {
         $name = isset( $this->options[ 'prefix' ] )
             ? $this->options[ 'prefix' ] . $name
@@ -166,5 +148,23 @@ class Cookie
         }
 
         return false;
+    }
+
+    // ------------------------------------------------------------------------
+
+    /**
+     * Cookie::setKey
+     *
+     * Sets cookie encryption protection key.
+     *
+     * @param string $key Custom encryption key.
+     *
+     * @return static
+     */
+    protected function setKey( $key )
+    {
+        $this->crypt->setKey( $key );
+
+        return $this;
     }
 }

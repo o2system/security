@@ -31,22 +31,27 @@ class TokenAuthentication
     private $token;
 
     // ------------------------------------------------------------------------
-    
+
     /**
-     * TokenAuthentication::setToken
+     * TokenAuthentication::verify
      *
-     * Sets X-WEB-TOKEN protection token.
+     * Checks if the posted X-WEB-TOKEN protection token is valid.
      *
      * @param string $token X-WEB-TOKEN protection token.
      *
-     * @return static
+     * @return bool
      */
-    public function setToken ( $token )
+    public function verify( $token = null )
     {
-        $_SESSION[ 'X-WEB-TOKEN' ] = $this->token = $token;
-        header( 'X-WEB-TOKEN: ' . $this->token );
+        $token = isset( $token )
+            ? $token
+            : input()->server( 'HTTP_X_WEB_TOKEN' );
 
-        return $this;
+        if ( false !== ( $this->getToken() === $token ) ) {
+            return true;
+        }
+
+        return false;
     }
 
     // ------------------------------------------------------------------------
@@ -58,7 +63,7 @@ class TokenAuthentication
      *
      * @return string|bool Returns FALSE if X-WEB-TOKEN protection token is not set.
      */
-    public function getToken ()
+    public function getToken()
     {
         if ( isset( $_SESSION[ 'X-WEB-TOKEN' ] ) ) {
             return $_SESSION[ 'X-WEB-TOKEN' ];
@@ -70,24 +75,19 @@ class TokenAuthentication
     // ------------------------------------------------------------------------
 
     /**
-     * TokenAuthentication::verify
+     * TokenAuthentication::setToken
      *
-     * Checks if the posted X-WEB-TOKEN protection token is valid.
+     * Sets X-WEB-TOKEN protection token.
      *
      * @param string $token X-WEB-TOKEN protection token.
      *
-     * @return bool
+     * @return static
      */
-    public function verify ( $token = null )
+    public function setToken( $token )
     {
-        $token = isset( $token )
-            ? $token
-            : input()->server( 'HTTP_X_WEB_TOKEN' );
+        $_SESSION[ 'X-WEB-TOKEN' ] = $this->token = $token;
+        header( 'X-WEB-TOKEN: ' . $this->token );
 
-        if ( false !== ( $this->getToken() === $token ) ) {
-            return true;
-        }
-
-        return false;
+        return $this;
     }
 }

@@ -12,13 +12,23 @@
 
 namespace O2System\Security\Access;
 
-use O2System\Libraries\Email;
+// ------------------------------------------------------------------------
 
+use O2System\Framework\Libraries\Email;
+
+/**
+ * Class Register
+ *
+ * @package O2System\Security\Access
+ */
 class Register
 {
     protected $emailHandler;
 
-    public function setEmailHandler ( Email $emailHandler )
+    /**
+     * @param \O2System\Framework\Libraries\Email $emailHandler
+     */
+    public function setEmailHandler( Email $emailHandler )
     {
 
     }

@@ -15,27 +15,27 @@ namespace O2System\Security\Access;
 
 class User
 {
-    public function login ( $username, $password, $remember = false )
+    public function login( $username, $password, $remember = false )
     {
 
     }
 
-    public function logout ()
+    public function logout()
     {
 
     }
 
-    public function getAccount ()
+    public function getAccount()
     {
 
     }
 
-    public function updateAccount ()
+    public function updateAccount()
     {
 
     }
 
-    public function isLogin ()
+    public function isLogin()
     {
 
     }
