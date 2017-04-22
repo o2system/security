@@ -260,7 +260,7 @@ class Crypt
      *
      * @param    array $params Input parameters
      *
-     * @return    array
+     * @return    array|bool
      */
     protected function getParams( $params )
     {

@@ -15,7 +15,7 @@ namespace O2System\Security\Access;
 
 class User
 {
-    public function login( $username, $password, $remember = false )
+    public function  ( $username, $password, $remember = false )
     {
 
     }
