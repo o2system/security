@@ -13,6 +13,7 @@
 namespace O2System\Security\Protections;
 
 // ------------------------------------------------------------------------
+
 use O2System\Spl\Exceptions\RuntimeException;
 
 /**

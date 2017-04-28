@@ -12,7 +12,13 @@
 
 namespace O2System\Security\Access\Interfaces;
 
+// ------------------------------------------------------------------------
 
+/**
+ * Interface UserModelInterface
+ *
+ * @package O2System\Security\Access\Interfaces
+ */
 interface UserModelInterface
 {
 

@@ -12,9 +12,15 @@
 
 namespace O2System\Security\Access\Interfaces;
 
+// ------------------------------------------------------------------------
 
 use O2System\Security\Access\Datastructures\UserData;
 
+/**
+ * Interface RegisterModelInterface
+ *
+ * @package O2System\Security\Access\Interfaces
+ */
 interface RegisterModelInterface
 {
     public function insertRegistrationData( UserData $userdata );

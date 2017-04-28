@@ -12,9 +12,15 @@
 
 namespace O2System\Security\Access\Datastructures;
 
+// ------------------------------------------------------------------------
 
 use O2System\Spl\Datastructures\SplArrayObject;
 
+/**
+ * Class UserData
+ *
+ * @package O2System\Security\Access\Datastructures
+ */
 class UserData extends SplArrayObject
 {
     public function __construct( array $userdata = [] )

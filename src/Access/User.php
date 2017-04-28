@@ -12,10 +12,15 @@
 
 namespace O2System\Security\Access;
 
-
+// ------------------------------------------------------------------------
+/**
+ * Class User
+ *
+ * @package O2System\Security\Access
+ */
 class User
 {
-    public function  ( $username, $password, $remember = false )
+    public function login( $username, $password, $remember = false )
     {
 
     }

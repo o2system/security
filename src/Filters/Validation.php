@@ -21,7 +21,6 @@ namespace O2System\Security\Filters;
  */
 class Validation
 {
-
     /**
      * Validation::isRequired
      *

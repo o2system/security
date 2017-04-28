@@ -12,7 +12,13 @@
 
 namespace O2System\Security\Access\Datastructures;
 
+// ------------------------------------------------------------------------
 
+/**
+ * Class UserSignature
+ *
+ * @package O2System\Security\Access\Datastructures
+ */
 class UserSignature
 {
 

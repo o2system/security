@@ -12,9 +12,15 @@
 
 namespace O2System\Security\Access;
 
+// ------------------------------------------------------------------------
 
 use O2System\Psr\Cache\CacheItemPoolInterface;
 
+/**
+ * Class Token
+ *
+ * @package O2System\Security\Access
+ */
 class Token
 {
     /**
