@@ -41,6 +41,5 @@
     "psr-4": {
       "O2System\\Security\\": "src"
     }
-  },
-  "minimum-stability": "dev"
+  }
 }
