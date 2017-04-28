@@ -42,5 +42,5 @@
       "O2System\\Security\\": "src"
     }
   },
-  "minimum-stability": "dev"
+  "minimum-stability": "dev-master"
 }
