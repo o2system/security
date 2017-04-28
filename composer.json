@@ -35,12 +35,12 @@
   },
   "require": {
     "php": ">=5.6.0",
-    "o2system/session":"dev-master"
+    "o2system/session":"*"
   },
   "autoload": {
     "psr-4": {
       "O2System\\Security\\": "src"
     }
   },
-  "minimum-stability": "dev-master"
+  "minimum-stability": "dev"
 }
