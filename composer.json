@@ -1,7 +1,7 @@
 {
   "name": "o2system/security",
   "description": "O2System Security",
-  "type": "php-interfaces",
+  "type": "package",
   "keywords": [
     "utilities",
     "php",
