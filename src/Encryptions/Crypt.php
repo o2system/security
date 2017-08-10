@@ -729,7 +729,7 @@ class Crypt
     /**
      * Create a random key
      *
-     * @param    int $length Output length
+     * @param    int $length Browser length
      *
      * @return    string
      */

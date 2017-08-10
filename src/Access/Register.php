@@ -23,12 +23,22 @@ use O2System\Framework\Libraries\Email;
  */
 class Register
 {
+    /**
+     * Register::$emailHandler
+     *
+     * @var Email
+     */
     protected $emailHandler;
 
     /**
      * @param \O2System\Framework\Libraries\Email $emailHandler
      */
     public function setEmailHandler( Email $emailHandler )
+    {
+
+    }
+
+    public function account( $account )
     {
 
     }
