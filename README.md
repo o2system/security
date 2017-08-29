@@ -1,7 +1,7 @@
 # security
 O2System Security Library
 
-### Composer Instalation
+### Composer Installation
 The best way to install O2System Security is to use [Composer](https://getcomposer.org)
 ```
 composer require o2system/security --prefer-dist dev-master
