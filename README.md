@@ -1,10 +1,29 @@
-# security
-O2System Security Library
+# O2System Security
+O2System Security is a collection of class libraries to help build security procedures within the O2System PHP Framework but can also be used independently for use in your PHP application.
+
+### Featured Two Way Encryptions
+- Binary
+- Cookie
+- Crypt via PHP's MCrypt and/or OpenSSL extensions
+- Password
+
+### Featured Filters
+- UTF8
+- Validation
+
+### Featured Protections
+- Captcha
+- Cross Site Request Forgery (CSRF)
+- Firewall
+- HTTP Authentication
+- Origin Authentication
+- Token Authentication
+- Cross Site Scripting (XSS)
 
 ### Composer Installation
 The best way to install O2System Security is to use [Composer](https://getcomposer.org)
 ```
-composer require o2system/security --prefer-dist dev-master
+composer require o2system/security
 ```
 > Packagist: [https://packagist.org/packages/o2system/security](https://packagist.org/packages/o2system/security)
 
