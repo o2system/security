@@ -1,5 +1,5 @@
 # O2System Security
-O2System Security is a collection of class libraries to help build security procedures within the O2System PHP Framework but can also be used independently for use in your PHP application.
+O2System Security is a collection of class libraries to help build security procedures within the O2System PHP Framework but it can also be used independently for use in your PHP application.
 
 ### Featured Two Way Encryptions
 - Binary
