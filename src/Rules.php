@@ -8,6 +8,7 @@
  * @author         Mohamad Rafi Randoni
  * @copyright      Copyright (c) Steeve Andrian Salim
  */
+
 // ------------------------------------------------------------------------
 
 namespace O2System\Security;
@@ -60,14 +61,18 @@ class Rules
 
     public function __construct( $sourceVars = [] )
     {
+        language()
+            ->addFilePath( __DIR__ . DIRECTORY_SEPARATOR )
+            ->loadFile( 'rules' );
+
         $this->customErrors = [
-            'required'  => ':attribute is required',
-            'float'     => ':attribute data format should be float',
-            'email'     => ':attribute not a valid email format',
-            'integer'   => ':attribute should be an integer',
-            'minLength' => ':attribute should be more than :params',
-            'maxLength' => ':attribute should be less than :params',
-            'listed'    => ':attribute not listed in :params',
+            'required'  => language()->getLine( 'SECURITY_RULES_E_REQUIRED' ),
+            'float'     => language()->getLine( 'SECURITY_RULES_E_FLOAT' ),
+            'email'     => language()->getLine( 'SECURITY_RULES_E_EMAIL' ),
+            'integer'   => language()->getLine( 'SECURITY_RULES_E_INTEGER' ),
+            'minLength' => language()->getLine( 'SECURITY_RULES_E_MINLENGTH' ),
+            'maxLength' => language()->getLine( 'SECURITY_RULES_E_MAXLENGTH' ),
+            'listed'    => language()->getLine( 'SECURITY_RULES_E_LISTED' ),
         ];
 
         if ( ! empty( $sourceVars ) ) {
@@ -174,14 +179,14 @@ class Rules
     {
         /* Check if data source is existed or not */
         if ( count( $this->sourceVars ) < 1 OR empty( $this->sourceVars ) ) {
-            throw new InvalidArgumentException( 'E_HEADER_INVALIDARGUMENTEXCEPTION', 1 );
+            throw new InvalidArgumentException( 'SECURITY_RULES_E_HEADER_INVALIDARGUMENTEXCEPTION', 1 );
         }
 
         foreach ( $this->rules as $field => $rule ) {
 
-            /* Throw exception if existed rules field not yet exist in data source */
+            /* Throw exception if existed rules field not yet exists in data source */
             if ( ! array_key_exists( $field, $this->sourceVars ) ) {
-                throw new OutOfRangeException( 'E_HEADER_OUTOFRANGEEXCEPTION', 1 );
+                throw new OutOfRangeException( 'SECURITY_RULES_E_HEADER_OUTOFRANGEEXCEPTION', 1 );
             }
 
             if ( is_string( $rule[ 'rules' ] ) ) {
@@ -218,7 +223,7 @@ class Rules
 
                     /* Throw exception if method not exists in validation class */
                     if ( ! method_exists( $validationClass, $method ) ) {
-                        throw new BadMethodCallException( 'E_HEADER_BADMETHODCALLEXCEPTION', 1 );
+                        throw new BadMethodCallException( 'SECURITY_RULES_E_HEADER_BADMETHODCALLEXCEPTION', 1 );
                     }
 
                     $validate = call_user_func_array( [ &$validationClass, $method ], $methodParams );

@@ -1,14 +1,23 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: steevenz
- * Date: 3/18/17
- * Time: 1:08 AM
+ * This file is part of the O2System PHP Framework package.
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ *
+ * @author         Steeve Andrian Salim
+ * @copyright      Copyright (c) Steeve Andrian Salim
  */
+// ------------------------------------------------------------------------
 
 namespace O2System\Security\Protections;
 
+// ------------------------------------------------------------------------
 
+/**
+ * Class OriginAuthentication
+ * @package O2System\Security\Protections
+ */
 class OriginAuthentication
 {
 

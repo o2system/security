@@ -39,6 +39,10 @@ class Captcha
      */
     public function __construct()
     {
+        language()
+            ->addFilePath( str_replace( 'Protections', '', __DIR__ ) . DIRECTORY_SEPARATOR )
+            ->loadFile( 'captcha' );
+
         if ( false === ( $this->token = $this->getToken() ) ) {
             $this->regenerate();
         }
@@ -136,7 +140,7 @@ class Captcha
         }
 
         // Cannot Initialize new GD image stream
-        throw new RuntimeException( 'E_SECURITY_CAPTCHA_GD_IMAGE_STREAM' );
+        throw new RuntimeException( 'SECURITY_E_CAPTCHA_GD_IMAGE_STREAM' );
     }
 
     // ------------------------------------------------------------------------
