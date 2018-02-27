@@ -142,6 +142,27 @@ class Binary
             $upperLetterCharacter,
             $numericCharacter
         );
+
+        if ( class_exists( '\O2System\Framework', false ) ) {
+            $key = config()->getItem( 'security' )->offsetGet( 'encryptionKey' );
+            $letters = str_split($key);
+            $cryptoKey = 0;
+
+            foreach ( $letters as $letter ) {
+                if ( $number = array_search( $letter, static::$charactersMap ) ) {
+                    $cryptoKey = $cryptoKey + $number;
+                }
+            }
+
+            $charactersMap = static::$charactersMap;
+            static::$charactersMap = [];
+
+            if($cryptoKey > 0) {
+                foreach($charactersMap as $key => $value) {
+                    static::$charactersMap[ $key * $cryptoKey ] = $value;
+                }
+            }
+        }
     }
 
     // ------------------------------------------------------------------------

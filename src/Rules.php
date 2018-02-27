@@ -17,6 +17,7 @@ use O2System\Security\Filters\Validation;
 use O2System\Spl\Exceptions\Logic\BadFunctionCall\BadMethodCallException;
 use O2System\Spl\Exceptions\Logic\InvalidArgumentException;
 use O2System\Spl\Exceptions\Logic\OutOfRangeException;
+use O2System\Spl\Traits\Collectors\ErrorCollectorTrait;
 
 /**
  * Class Rules
@@ -25,6 +26,8 @@ use O2System\Spl\Exceptions\Logic\OutOfRangeException;
  */
 class Rules
 {
+    use ErrorCollectorTrait;
+
     /**
      * Validation Rules
      *
@@ -32,14 +35,6 @@ class Rules
      * @type    array
      */
     protected $rules = [];
-
-    /**
-     * Validation Errors
-     *
-     * @access  protected
-     * @type    array
-     */
-    protected $errors = [];
 
     /**
      * Validation Messages
@@ -59,24 +54,24 @@ class Rules
 
     // ------------------------------------------------------------------------
 
-    public function __construct( $sourceVars = [] )
+    public function __construct($sourceVars = [])
     {
         language()
-            ->addFilePath( __DIR__ . DIRECTORY_SEPARATOR )
-            ->loadFile( 'rules' );
+            ->addFilePath(__DIR__ . DIRECTORY_SEPARATOR)
+            ->loadFile('rules');
 
         $this->customErrors = [
-            'required'  => language()->getLine( 'SECURITY_RULES_E_REQUIRED' ),
-            'float'     => language()->getLine( 'SECURITY_RULES_E_FLOAT' ),
-            'email'     => language()->getLine( 'SECURITY_RULES_E_EMAIL' ),
-            'integer'   => language()->getLine( 'SECURITY_RULES_E_INTEGER' ),
-            'minLength' => language()->getLine( 'SECURITY_RULES_E_MINLENGTH' ),
-            'maxLength' => language()->getLine( 'SECURITY_RULES_E_MAXLENGTH' ),
-            'listed'    => language()->getLine( 'SECURITY_RULES_E_LISTED' ),
+            'required'  => language()->getLine('SECURITY_RULES_E_REQUIRED'),
+            'float'     => language()->getLine('SECURITY_RULES_E_FLOAT'),
+            'email'     => language()->getLine('SECURITY_RULES_E_EMAIL'),
+            'integer'   => language()->getLine('SECURITY_RULES_E_INTEGER'),
+            'minLength' => language()->getLine('SECURITY_RULES_E_MINLENGTH'),
+            'maxLength' => language()->getLine('SECURITY_RULES_E_MAXLENGTH'),
+            'listed'    => language()->getLine('SECURITY_RULES_E_LISTED'),
         ];
 
-        if ( ! empty( $sourceVars ) ) {
-            if ( $sourceVars instanceof \ArrayObject ) {
+        if ( ! empty($sourceVars)) {
+            if ($sourceVars instanceof \ArrayObject) {
                 $sourceVars = $sourceVars->getArrayCopy();
             }
 
@@ -90,7 +85,7 @@ class Rules
      *
      * @access  public
      */
-    public function setSource( array $sourceVars )
+    public function setSource(array $sourceVars)
     {
         $this->sourceVars = $sourceVars;
     }
@@ -103,7 +98,7 @@ class Rules
      * @param string $key
      * @param string $value
      */
-    public function addSource( $key, $value )
+    public function addSource($key, $value)
     {
         $this->sourceVars[ $key ] = $value;
     }
@@ -115,10 +110,10 @@ class Rules
      *
      * @param array $rules
      */
-    public function addRules( array $rules )
+    public function addRules(array $rules)
     {
-        foreach ( $rules as $rule ) {
-            $this->addRule( $rule[ 'field' ], $rule[ 'label' ], $rule[ 'rules' ], $rule[ 'messages' ] );
+        foreach ($rules as $rule) {
+            $this->addRule($rule[ 'field' ], $rule[ 'label' ], $rule[ 'rules' ], $rule[ 'messages' ]);
         }
     }
 
@@ -132,7 +127,7 @@ class Rules
      * @param       $rules
      * @param array $messages
      */
-    public function addRule( $field, $label, $rules, $messages = [] )
+    public function addRule($field, $label, $rules, $messages = [])
     {
         $this->rules[ $field ] = [
             'field'    => $field,
@@ -151,9 +146,9 @@ class Rules
      *
      * @return bool
      */
-    public function hasRule( $field )
+    public function hasRule($field)
     {
-        if ( array_key_exists( $field, $this->rules ) ) {
+        if (array_key_exists($field, $this->rules)) {
             return true;
         }
 
@@ -168,7 +163,7 @@ class Rules
      * @param $field
      * @param $message
      */
-    public function setMessage( $field, $message )
+    public function setMessage($field, $message)
     {
         $this->customErrors[ $field ] = $message;
     }
@@ -177,94 +172,95 @@ class Rules
 
     public function validate()
     {
-        /* Check if data source is existed or not */
-        if ( count( $this->sourceVars ) < 1 OR empty( $this->sourceVars ) ) {
-            throw new InvalidArgumentException( 'SECURITY_RULES_E_HEADER_INVALIDARGUMENTEXCEPTION', 1 );
+        if (count($this->sourceVars) == 0) {
+            $this->addError(1, language()->getLine('SECURITY_RULES_E_DATA_SOURCE_EMPTY'));
+
+            return false;
         }
 
-        foreach ( $this->rules as $field => $rule ) {
+        foreach ($this->rules as $field => $rule) {
 
             /* Throw exception if existed rules field not yet exists in data source */
-            if ( ! array_key_exists( $field, $this->sourceVars ) ) {
-                throw new OutOfRangeException( 'SECURITY_RULES_E_HEADER_OUTOFRANGEEXCEPTION', 1 );
+            if ( ! array_key_exists($field, $this->sourceVars)) {
+                throw new OutOfRangeException('SECURITY_RULES_E_HEADER_OUTOFRANGEEXCEPTION', 1);
             }
 
-            if ( is_string( $rule[ 'rules' ] ) ) {
+            if (is_string($rule[ 'rules' ])) {
                 /* Explode rules by | as delimiter */
-                $xRule = explode( '|', $rule[ 'rules' ] );
+                $xRule = explode('|', $rule[ 'rules' ]);
 
-                foreach ( $xRule as $method ) {
+                foreach ($xRule as $method) {
                     $validationClass = new Validation;
 
                     /* Get parameter from given data */
                     $methodParams = $this->sourceVars[ $field ];
-                    if ( ! is_array( $methodParams ) ) {
-                        $methodParams = [ $methodParams ];
+                    if ( ! is_array($methodParams)) {
+                        $methodParams = [$methodParams];
                     }
 
-                    if ( empty( $methodParams ) ) {
-                        array_unshift( $methodParams, null );
+                    if (empty($methodParams)) {
+                        array_unshift($methodParams, null);
                     }
 
                     /* Check if rules has parameter */
-                    if ( preg_match_all( "/\[(.*)\]/", $method, $ruleParams ) ) {
+                    if (preg_match_all("/\[(.*)\]/", $method, $ruleParams)) {
 
                         /* Remove [] from method */
-                        $method = preg_replace( "/\[.*\]/", '', $method );
+                        $method = preg_replace("/\[.*\]/", '', $method);
 
                         /* Explode rule parameter */
-                        $ruleParams = explode( ',', preg_replace( "/,[ ]+/", ',', $ruleParams[ 1 ][ 0 ] ) );
+                        $ruleParams = explode(',', preg_replace("/,[ ]+/", ',', $ruleParams[ 1 ][ 0 ]));
 
                         /* Merge method's param with rule's param */
-                        $methodParams = array_merge( $methodParams, $ruleParams );
+                        $methodParams = array_merge($methodParams, $ruleParams);
                     }
 
-                    $method = 'is' . studlycase( $method );
+                    $method = 'is' . studlycase($method);
 
                     /* Throw exception if method not exists in validation class */
-                    if ( ! method_exists( $validationClass, $method ) ) {
-                        throw new BadMethodCallException( 'SECURITY_RULES_E_HEADER_BADMETHODCALLEXCEPTION', 1 );
+                    if ( ! method_exists($validationClass, $method)) {
+                        throw new BadMethodCallException('SECURITY_RULES_E_HEADER_BADMETHODCALLEXCEPTION', 1);
                     }
 
-                    $validate = call_user_func_array( [ &$validationClass, $method ], $methodParams );
+                    $validate = call_user_func_array([&$validationClass, $method], $methodParams);
 
-                    if ( ! $validate ) {
+                    if ( ! $validate) {
                         /* Reverse method name to lower case */
-                        $methodName = lcfirst( str_replace( 'is', '', $method ) );
+                        $methodName = lcfirst(str_replace('is', '', $method));
 
-                        if ( ! empty( $rule[ 'messages' ] ) ) {
+                        if ( ! empty($rule[ 'messages' ])) {
                             $message = $rule[ 'messages' ];
 
                             /* If $rule message is array, replace $message with specified message */
-                            if ( is_array( $rule[ 'messages' ] ) ) {
-                                if ( isset( $rule[ 'messages' ][ $methodName ] ) ) {
+                            if (is_array($rule[ 'messages' ])) {
+                                if (isset($rule[ 'messages' ][ $methodName ])) {
                                     $message = $rule[ 'messages' ][ $methodName ];
                                 } else {
                                     $message = $rule[ 'messages' ][ $field ];
                                 }
                             }
-                        } elseif ( array_key_exists( $field, $this->customErrors ) ) {
+                        } elseif (array_key_exists($field, $this->customErrors)) {
                             $message = $this->customErrors[ $field ];
-                        } elseif ( array_key_exists( $methodName, $this->customErrors ) ) {
+                        } elseif (array_key_exists($methodName, $this->customErrors)) {
                             $message = $this->customErrors[ $methodName ];
                         } else {
-                            $message = strtoupper( 'is_' . join( '', explode( 'is', $method ) ) );
+                            $message = strtoupper('is_' . join('', explode('is', $method)));
                         }
 
                         /* Replace message placeholder, :attribute, :params */
-                        $message = str_replace( ':attribute', $field, $message );
-                        if ( isset( $ruleParams ) AND ! empty( $ruleParams[ 0 ] ) ) {
-                            $message = str_replace( ':params', implode( ',', $ruleParams ), $message );
+                        $message = str_replace(':attribute', $field, $message);
+                        if (isset($ruleParams) AND ! empty($ruleParams[ 0 ])) {
+                            $message = str_replace(':params', implode(',', $ruleParams), $message);
                         }
 
-                        $this->setError( $message, $methodParams );
+                        $this->setError($message, $methodParams);
                     }
 
                 }
             }
         }
 
-        return empty( $this->errors ) ? true : false;
+        return empty($this->errors) ? true : false;
     }
 
     // --------------------------------------------------------------------------------------
@@ -275,32 +271,20 @@ class Rules
      * @param       $error
      * @param array $vars
      */
-    protected function setError( $error, $vars = [] )
+    protected function setError($error, $vars = [])
     {
-        if ( array_key_exists( $error, $this->customErrors ) ) {
+        if (array_key_exists($error, $this->customErrors)) {
             $error = $this->customErrors[ $error ];
         } else {
-            language()->loadFile( 'validation' );
-            $line = language()->getLine( $error );
+            language()->loadFile('validation');
+            $line = language()->getLine($error);
 
-            if ( ! empty( $line ) ) {
+            if ( ! empty($line)) {
                 $error = $line;
             }
         }
 
-        array_unshift( $vars, $error );
-        $this->errors[] = call_user_func_array( 'sprintf', $vars );
-    }
-
-    // ------------------------------------------------------------------------
-
-    /**
-     * Validation::getErrors
-     *
-     * @return array
-     */
-    public function getErrors()
-    {
-        return $this->errors;
+        array_unshift($vars, $error);
+        $this->errors[] = call_user_func_array('sprintf', $vars);
     }
 }
