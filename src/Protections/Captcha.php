@@ -105,10 +105,14 @@ class Captcha
      */
     public function getImage()
     {
-        $tempFilePath = tempnam(
-            sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'o2system' . DIRECTORY_SEPARATOR,
-            'captcha'
-        );
+        if(class_exists('O2System\Framework')) {
+            $tempFilePath = @tempnam(PATH_CACHE, 'captcha');
+        } else {
+            $tempFilePath = @tempnam(
+                sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'o2system' . DIRECTORY_SEPARATOR,
+                'captcha'
+            );
+        }
 
         if ( $image = imagecreatetruecolor( 200, 50 ) ) {
             $backgroundColor = imagecolorallocate( $image, 255, 255, 255 );
