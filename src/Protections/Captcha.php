@@ -158,7 +158,7 @@ class Captcha
      *
      * @return bool
      */
-    public function isValid( $token = null )
+    public function verify( $token = null )
     {
         $token = isset( $token )
             ? $token

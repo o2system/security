@@ -78,7 +78,7 @@ class Token
      *
      * Sets oauth_token_secret.
      *
-     * @param $secret oauth_token_secret.
+     * @param string $secret oauth_token_secret.
      *
      * @return static
      */
