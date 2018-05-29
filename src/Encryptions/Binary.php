@@ -8,6 +8,7 @@
  * @author         Steeve Andrian Salim
  * @copyright      Copyright (c) Steeve Andrian Salim
  */
+
 // ------------------------------------------------------------------------
 
 namespace O2System\Security\Encryptions;
@@ -125,14 +126,14 @@ class Binary
         /**
          * Uppercase letter character
          */
-        $upperLetterCharacter = array_map( 'strtoupper', $lowerLetterCharacter );
+        $upperLetterCharacter = array_map('strtoupper', $lowerLetterCharacter);
 
         // ------------------------------------------------------------------------
 
         /**
          * Binary character
          */
-        $numericCharacter = range( 0, 9, 1 );
+        $numericCharacter = range(0, 9, 1);
 
         // ------------------------------------------------------------------------
 
@@ -143,13 +144,13 @@ class Binary
             $numericCharacter
         );
 
-        if ( class_exists( '\O2System\Framework', false ) ) {
-            $key = config()->getItem( 'security' )->offsetGet( 'encryptionKey' );
+        if (class_exists('\O2System\Framework', false)) {
+            $key = config()->getItem('security')->offsetGet('encryptionKey');
             $letters = str_split($key);
             $cryptoKey = 0;
 
-            foreach ( $letters as $letter ) {
-                if ( $number = array_search( $letter, static::$charactersMap ) ) {
+            foreach ($letters as $letter) {
+                if ($number = array_search($letter, static::$charactersMap)) {
                     $cryptoKey = $cryptoKey + $number;
                 }
             }
@@ -157,8 +158,8 @@ class Binary
             $charactersMap = static::$charactersMap;
             static::$charactersMap = [];
 
-            if($cryptoKey > 0) {
-                foreach($charactersMap as $key => $value) {
+            if ($cryptoKey > 0) {
+                foreach ($charactersMap as $key => $value) {
                     static::$charactersMap[ $key * $cryptoKey ] = $value;
                 }
             }
@@ -176,15 +177,15 @@ class Binary
      *
      * @return string
      */
-    public function encrypt( $string )
+    public function encrypt($string)
     {
         $numbers = [];
-        $letters = str_split( $this->crypt->encrypt( $string ) );
+        $letters = str_split($this->crypt->encrypt($string));
 
         $i = 0;
-        foreach ( $letters as $letter ) {
-            if ( $number = array_search( $letter, static::$charactersMap ) ) {
-                if ( $i == 20 ) {
+        foreach ($letters as $letter) {
+            if ($number = array_search($letter, static::$charactersMap)) {
+                if ($i == 20) {
                     $number = $number . PHP_EOL;
                     $i = 0;
                 }
@@ -195,7 +196,7 @@ class Binary
             }
         }
 
-        return implode( ' ', $numbers );
+        return implode(' ', $numbers);
     }
 
     // ------------------------------------------------------------------------
@@ -209,18 +210,18 @@ class Binary
      *
      * @return string
      */
-    public function decrypt( $numbers )
+    public function decrypt($numbers)
     {
         $letters = [];
-        $numbers = explode( ' ', str_replace( PHP_EOL, '', $numbers ) );
+        $numbers = explode(' ', str_replace(PHP_EOL, '', $numbers));
 
-        foreach ( $numbers as $number ) {
-            if ( array_key_exists( $number, static::$charactersMap ) ) {
+        foreach ($numbers as $number) {
+            if (array_key_exists($number, static::$charactersMap)) {
                 $letters[] = static::$charactersMap[ $number ];
             }
         }
 
-        return $this->crypt->decrypt( implode( '', $letters ) );
+        return $this->crypt->decrypt(implode('', $letters));
     }
 
     // ------------------------------------------------------------------------
@@ -234,9 +235,9 @@ class Binary
      *
      * @return static
      */
-    protected function setKey( $key )
+    protected function setKey($key)
     {
-        $this->crypt->setKey( $key );
+        $this->crypt->setKey($key);
 
         return $this;
     }

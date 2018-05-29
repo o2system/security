@@ -13,9 +13,9 @@
 
 namespace O2System\Security;
 
+use O2System\Framework\Libraries\Ui\Contents\Lists\Unordered;
 use O2System\Security\Filters\Validation;
 use O2System\Spl\Exceptions\Logic\BadFunctionCall\BadMethodCallException;
-use O2System\Spl\Exceptions\Logic\InvalidArgumentException;
 use O2System\Spl\Exceptions\Logic\OutOfRangeException;
 use O2System\Spl\Traits\Collectors\ErrorCollectorTrait;
 
@@ -248,7 +248,7 @@ class Rules
                         }
 
                         /* Replace message placeholder, :attribute, :params */
-                        $message = str_replace(':attribute', $field, $message);
+                        $message = str_replace(':attribute', (isset($rule['label']) ? $rule['label'] : $field), $message);
                         if (isset($ruleParams) AND ! empty($ruleParams[ 0 ])) {
                             $message = str_replace(':params', implode(',', $ruleParams), $message);
                         }
@@ -286,5 +286,18 @@ class Rules
 
         array_unshift($vars, $error);
         $this->errors[] = call_user_func_array('sprintf', $vars);
+    }
+
+    // --------------------------------------------------------------------------------------
+
+    public function displayErrors()
+    {
+        $ul = new Unordered();
+
+        foreach($this->getErrors() as $error) {
+            $ul->createList($error);
+        }
+
+        return $ul->render();
     }
 }

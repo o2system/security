@@ -8,6 +8,7 @@
  * @author         Steeve Andrian Salim
  * @copyright      Copyright (c) Steeve Andrian Salim
  */
+
 // ------------------------------------------------------------------------
 
 namespace O2System\Security\Protections\Throttle;
@@ -25,14 +26,14 @@ class Consumer extends SplArrayObject
     public function __construct(array $consumer = [])
     {
         parent::__construct(array_merge([
-            'ipAddress' => request()->getClientIpAddress(),
-            'userAgent' => request()->getClientUserAgent(),
-            'attempts' => 0,
+            'ipAddress' => server_request()->getClientIpAddress(),
+            'userAgent' => server_request()->getClientUserAgent(),
+            'attempts'  => 0,
         ], $consumer));
     }
 
     public function getId()
     {
-        return md5($this->ipAddress.$this->userAgent);
+        return md5($this->ipAddress . $this->userAgent);
     }
 }

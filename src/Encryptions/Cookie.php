@@ -8,6 +8,7 @@
  * @author         Steeve Andrian Salim
  * @copyright      Copyright (c) Steeve Andrian Salim
  */
+
 // ------------------------------------------------------------------------
 
 namespace O2System\Security\Encryptions;
@@ -56,14 +57,14 @@ class Cookie
             'httpOnly' => false,
         ];
 
-        if ( class_exists( '\O2System\Framework', false ) ) {
-            $this->options = config()->getItem( 'cookie' )->getArrayCopy();
+        if (class_exists('\O2System\Framework', false)) {
+            $this->options = config()->getItem('cookie')->getArrayCopy();
             $this->options[ 'expire' ] = time() + $this->options[ 'lifetime' ];
-            unset( $this->options[ 'lifetime' ] );
+            unset($this->options[ 'lifetime' ]);
         }
 
-        $this->options[ 'domain' ] = empty( $this->options[ 'domain' ] )
-            ? isset( $_SERVER[ 'HTTP_HOST' ] )
+        $this->options[ 'domain' ] = empty($this->options[ 'domain' ])
+            ? isset($_SERVER[ 'HTTP_HOST' ])
                 ? $_SERVER[ 'HTTP_HOST' ]
                 : $_SERVER[ 'SERVER_NAME' ]
             : $this->options[ 'domain' ];
@@ -80,10 +81,10 @@ class Cookie
      *
      * @return static
      */
-    public function setOptions( array $options )
+    public function setOptions(array $options)
     {
-        foreach ( $options as $key => $value ) {
-            if ( array_key_exists( $key, $this->options ) ) {
+        foreach ($options as $key => $value) {
+            if (array_key_exists($key, $this->options)) {
                 $this->options[ $key ] = $value;
             }
         }
@@ -103,17 +104,17 @@ class Cookie
      *
      * @return bool
      */
-    public function encrypt( $name, $value )
+    public function encrypt($name, $value)
     {
-        $value = is_array( $value ) || is_object( $value )
-            ? serialize( $value )
+        $value = is_array($value) || is_object($value)
+            ? serialize($value)
             : $value;
 
-        $name = isset( $this->options[ 'prefix' ] )
+        $name = isset($this->options[ 'prefix' ])
             ? $this->options[ 'prefix' ] . $name
             : $name;
 
-        $value = $this->crypt->encrypt( $value );
+        $value = $this->crypt->encrypt($value);
 
         return setcookie(
             $name,
@@ -137,14 +138,14 @@ class Cookie
      *
      * @return string|bool Returns FALSE if cookie is not exists or the decryption failure.
      */
-    public function decrypt( $name )
+    public function decrypt($name)
     {
-        $name = isset( $this->options[ 'prefix' ] )
+        $name = isset($this->options[ 'prefix' ])
             ? $this->options[ 'prefix' ] . $name
             : $name;
 
-        if ( $value = input()->cookie( $name ) ) {
-            return $this->crypt->decrypt( $value );
+        if ($value = input()->cookie($name)) {
+            return $this->crypt->decrypt($value);
         }
 
         return false;
@@ -161,9 +162,9 @@ class Cookie
      *
      * @return static
      */
-    protected function setKey( $key )
+    protected function setKey($key)
     {
-        $this->crypt->setKey( $key );
+        $this->crypt->setKey($key);
 
         return $this;
     }

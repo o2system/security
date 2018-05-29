@@ -26,38 +26,38 @@ class MachineId
      */
     public static function generate()
     {
-        if(class_exists('O2System\Filesystem\System')) {
+        if (class_exists('O2System\Filesystem\System')) {
             $system = new \O2System\Filesystem\System();
 
             $metadata = [
-                'machine' => $system->getMachine(),
+                'machine'         => $system->getMachine(),
                 'operatingSystem' => [
-                    'name' => $system->getName(),
+                    'name'    => $system->getName(),
                     'version' => $system->getVersion(),
-                    'release' => $system->getRelease()
+                    'release' => $system->getRelease(),
                 ],
-                'hostname' => $system->getHostname(),
-                'cpuCores' => $system->getCpuCores(),
-                'macAddress' => $system->getMacAddress()
+                'hostname'        => $system->getHostname(),
+                'cpuCores'        => $system->getCpuCores(),
+                'macAddress'      => $system->getMacAddress(),
             ];
         } else {
             $metadata = [
-                'machine' => php_uname('m'),
+                'machine'         => php_uname('m'),
                 'operatingSystem' => [
-                    'name' => php_uname('s'),
+                    'name'    => php_uname('s'),
                     'version' => php_uname('v'),
-                    'release' => php_uname('r')
+                    'release' => php_uname('r'),
                 ],
-                'hostname' => php_uname('n'),
-                'cpuCores' => 1,
-                'macAddress' => implode(':', str_split(substr(md5('none'), 0, 12), 2))
+                'hostname'        => php_uname('n'),
+                'cpuCores'        => 1,
+                'macAddress'      => implode(':', str_split(substr(md5('none'), 0, 12), 2)),
             ];
         }
 
         $uri = new Uri();
 
-        $metadata['domain'] = $uri->getHost();
-        $metadata['ipAddress'] = $_SERVER['SERVER_ADDR'];
+        $metadata[ 'domain' ] = $uri->getHost();
+        $metadata[ 'ipAddress' ] = $_SERVER[ 'SERVER_ADDR' ];
 
         $string = json_encode($metadata);
         $string = md5($string);

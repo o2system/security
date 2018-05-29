@@ -33,9 +33,9 @@ class Rate
     public function __construct(array $config = [])
     {
         $config = array_merge([
-            'span' => 1,
-            'retry' => 10,
-            'attempts' => 5
+            'span'     => 1,
+            'retry'    => 10,
+            'attempts' => 5,
         ], $config);
 
         $this->setConfig($config);

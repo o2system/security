@@ -8,6 +8,7 @@
  * @author         Steeve Andrian Salim
  * @copyright      Copyright (c) Steeve Andrian Salim
  */
+
 // ------------------------------------------------------------------------
 
 namespace O2System\Security\Protections;
@@ -40,10 +41,10 @@ class Captcha
     public function __construct()
     {
         language()
-            ->addFilePath( str_replace( 'Protections', '', __DIR__ ) . DIRECTORY_SEPARATOR )
-            ->loadFile( 'captcha' );
+            ->addFilePath(str_replace('Protections', '', __DIR__) . DIRECTORY_SEPARATOR)
+            ->loadFile('captcha');
 
-        if ( false === ( $this->token = $this->getToken() ) ) {
+        if (false === ($this->token = $this->getToken())) {
             $this->regenerate();
         }
     }
@@ -59,7 +60,7 @@ class Captcha
      */
     protected function getToken()
     {
-        if ( isset( $_SESSION[ 'captchaToken' ] ) ) {
+        if (isset($_SESSION[ 'captchaToken' ])) {
             return $_SESSION[ 'captchaToken' ];
         }
 
@@ -105,7 +106,7 @@ class Captcha
      */
     public function getImage()
     {
-        if(class_exists('O2System\Framework')) {
+        if (class_exists('O2System\Framework')) {
             $tempFilePath = @tempnam(PATH_CACHE, 'captcha');
         } else {
             $tempFilePath = @tempnam(
@@ -114,37 +115,37 @@ class Captcha
             );
         }
 
-        if ( $image = imagecreatetruecolor( 200, 50 ) ) {
-            $backgroundColor = imagecolorallocate( $image, 255, 255, 255 );
-            $lineColor = imagecolorallocate( $image, 64, 64, 64 );
-            $pixelColor = imagecolorallocate( $image, 0, 0, 255 );
+        if ($image = imagecreatetruecolor(200, 50)) {
+            $backgroundColor = imagecolorallocate($image, 255, 255, 255);
+            $lineColor = imagecolorallocate($image, 64, 64, 64);
+            $pixelColor = imagecolorallocate($image, 0, 0, 255);
 
-            imagefilledrectangle( $image, 0, 0, 200, 50, $backgroundColor );
+            imagefilledrectangle($image, 0, 0, 200, 50, $backgroundColor);
 
-            for ( $i = 0; $i < 3; $i++ ) {
-                imageline( $image, 0, rand() % 50, 200, rand() % 50, $lineColor );
+            for ($i = 0; $i < 3; $i++) {
+                imageline($image, 0, rand() % 50, 200, rand() % 50, $lineColor);
             }
 
-            for ( $i = 0; $i < 1000; $i++ ) {
-                imagesetpixel( $image, rand() % 200, rand() % 50, $pixelColor );
+            for ($i = 0; $i < 1000; $i++) {
+                imagesetpixel($image, rand() % 200, rand() % 50, $pixelColor);
             }
 
-            $textColor = imagecolorallocate( $image, 0, 0, 0 );
+            $textColor = imagecolorallocate($image, 0, 0, 0);
 
-            for ( $i = 0; $i < 6; $i++ ) {
-                imagestring( $image, 10, 20 + ( $i * 30 ), 20, substr( $this->getToken(), $i, 1 ), $textColor );
+            for ($i = 0; $i < 6; $i++) {
+                imagestring($image, 10, 20 + ($i * 30), 20, substr($this->getToken(), $i, 1), $textColor);
             }
 
-            imagepng( $image, $tempFilePath );
+            imagepng($image, $tempFilePath);
 
-            $base64Image = base64_encode( file_get_contents( $tempFilePath ) );
-            @unlink( $tempFilePath );
+            $base64Image = base64_encode(file_get_contents($tempFilePath));
+            @unlink($tempFilePath);
 
             return 'data:image/png;base64,' . $base64Image;
         }
 
         // Cannot Initialize new GD image stream
-        throw new RuntimeException( 'SECURITY_E_CAPTCHA_GD_IMAGE_STREAM' );
+        throw new RuntimeException('SECURITY_E_CAPTCHA_GD_IMAGE_STREAM');
     }
 
     // ------------------------------------------------------------------------
@@ -158,13 +159,13 @@ class Captcha
      *
      * @return bool
      */
-    public function verify( $token = null )
+    public function verify($token = null)
     {
-        $token = isset( $token )
+        $token = isset($token)
             ? $token
-            : input()->postGet( 'captchaToken' );
+            : input()->postGet('captchaToken');
 
-        if ( false !== ( $this->getToken() === $token ) ) {
+        if (false !== ($this->getToken() === $token)) {
             return true;
         }
 

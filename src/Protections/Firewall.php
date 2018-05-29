@@ -8,6 +8,7 @@
  * @author         Steeve Andrian Salim
  * @copyright      Copyright (c) Steeve Andrian Salim
  */
+
 // ------------------------------------------------------------------------
 
 namespace O2System\Security\Protections;
@@ -59,9 +60,9 @@ class Firewall
      *
      * @return static
      */
-    public function setIpVersion( $ipVersion )
+    public function setIpVersion($ipVersion)
     {
-        if ( in_array( $ipVersion, [ FILTER_FLAG_IPV4, FILTER_FLAG_IPV6 ] ) ) {
+        if (in_array($ipVersion, [FILTER_FLAG_IPV4, FILTER_FLAG_IPV6])) {
             $this->ipVersion = $ipVersion;
         }
 
@@ -79,10 +80,10 @@ class Firewall
      *
      * @return static
      */
-    public function setWhitelistIpAddresses( array $ipAddresses )
+    public function setWhitelistIpAddresses(array $ipAddresses)
     {
-        foreach ( $ipAddresses as $ipAddress ) {
-            if ( $this->isValid( $ipAddress ) ) {
+        foreach ($ipAddresses as $ipAddress) {
+            if ($this->isValid($ipAddress)) {
                 $this->whitelistIpAddresses[] = $ipAddress;
             }
         }
@@ -101,9 +102,9 @@ class Firewall
      *
      * @return mixed
      */
-    protected function isValid( $ipAddress )
+    protected function isValid($ipAddress)
     {
-        return filter_var( $ipAddress, FILTER_FLAG_IPV4 );
+        return filter_var($ipAddress, FILTER_FLAG_IPV4);
     }
 
     // ------------------------------------------------------------------------
@@ -117,9 +118,9 @@ class Firewall
      *
      * @return static
      */
-    public function addWhitelistIpAddress( $ipAddress )
+    public function addWhitelistIpAddress($ipAddress)
     {
-        if ( $this->isValid( $ipAddress ) ) {
+        if ($this->isValid($ipAddress)) {
             $this->whitelistIpAddresses[] = $ipAddress;
         }
 
@@ -137,10 +138,10 @@ class Firewall
      *
      * @return static
      */
-    public function setBlacklistIpAddresses( array $ipAddresses )
+    public function setBlacklistIpAddresses(array $ipAddresses)
     {
-        foreach ( $ipAddresses as $ipAddress ) {
-            if ( $this->isValid( $ipAddress ) ) {
+        foreach ($ipAddresses as $ipAddress) {
+            if ($this->isValid($ipAddress)) {
                 $this->blacklistIpAddresses[] = $ipAddress;
             }
         }
@@ -159,9 +160,9 @@ class Firewall
      *
      * @return static
      */
-    public function addBlacklistIpAddress( $ipAddress )
+    public function addBlacklistIpAddress($ipAddress)
     {
-        if ( $this->isValid( $ipAddress ) ) {
+        if ($this->isValid($ipAddress)) {
             $this->whitelistIpAddresses[] = $ipAddress;
         }
 
@@ -177,14 +178,14 @@ class Firewall
      *
      * @return bool
      */
-    public function verify( $ipAddress = null )
+    public function verify($ipAddress = null)
     {
-        $ipAddress = isset( $ipAddress )
+        $ipAddress = isset($ipAddress)
             ? $ipAddress
             : input()->ipAddress();
 
-        if ( $this->isWhitelisted( $ipAddress ) OR
-            $this->isBlacklisted( $ipAddress ) === false
+        if ($this->isWhitelisted($ipAddress) OR
+            $this->isBlacklisted($ipAddress) === false
         ) {
             return true;
         }
@@ -203,10 +204,10 @@ class Firewall
      *
      * @return bool
      */
-    public function isWhitelisted( $ipAddress )
+    public function isWhitelisted($ipAddress)
     {
-        if ( $this->isValid( $ipAddress ) ) {
-            return (bool)in_array( $ipAddress, $this->whitelistIpAddresses );
+        if ($this->isValid($ipAddress)) {
+            return (bool)in_array($ipAddress, $this->whitelistIpAddresses);
         }
 
         return false;
@@ -223,10 +224,10 @@ class Firewall
      *
      * @return bool
      */
-    public function isBlacklisted( $ipAddress )
+    public function isBlacklisted($ipAddress)
     {
-        if ( $this->isValid( $ipAddress ) ) {
-            return (bool)in_array( $ipAddress, $this->whitelistIpAddresses );
+        if ($this->isValid($ipAddress)) {
+            return (bool)in_array($ipAddress, $this->whitelistIpAddresses);
         }
 
         return false;

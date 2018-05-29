@@ -8,6 +8,7 @@
  * @author         Steeve Andrian Salim
  * @copyright      Copyright (c) Steeve Andrian Salim
  */
+
 // ------------------------------------------------------------------------
 
 namespace O2System\Security\Protections\Oauth\Datastructures;
@@ -30,9 +31,9 @@ class Token extends SplArrayObject
     public function __construct(array $token = [])
     {
         parent::__construct(array_merge([
-            'key' => null,
+            'key'    => null,
             'secret' => null,
-            'type' => 'Bearer'
+            'type'   => 'Bearer',
         ], $token));
     }
 

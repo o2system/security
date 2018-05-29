@@ -8,6 +8,7 @@
  * @author         Steeve Andrian Salim
  * @copyright      Copyright (c) Steeve Andrian Salim
  */
+
 // ------------------------------------------------------------------------
 
 namespace O2System\Security\Encryptions;
@@ -64,15 +65,15 @@ class Password
      *
      * @return static
      */
-    public function setAlgorithm( $algorithm )
+    public function setAlgorithm($algorithm)
     {
-        if ( in_array(
+        if (in_array(
             $algorithm,
             [
                 PASSWORD_DEFAULT,
                 PASSWORD_BCRYPT,
             ]
-        ) ) {
+        )) {
             $this->algorithm = $algorithm;
         }
 
@@ -93,7 +94,7 @@ class Password
      *
      * @return $this
      */
-    public function setOptions( array $options )
+    public function setOptions(array $options)
     {
         $this->options = $options;
 
@@ -113,22 +114,22 @@ class Password
      *
      * @return string|bool Returns FALSE if the password not verified.
      */
-    public function rehash( $password, $hash, $salt = null )
+    public function rehash($password, $hash, $salt = null)
     {
-        if ( $this->verify( $password, $hash, $salt ) ) {
+        if ($this->verify($password, $hash, $salt)) {
 
             $algorithm = $this->algorithm === PASSWORD_DEFAULT
                 ? PASSWORD_BCRYPT
                 : PASSWORD_DEFAULT;
 
-            if ( password_needs_rehash(
+            if (password_needs_rehash(
                 $hash,
                 $algorithm,
                 [
-                    'cost' => strlen( $hash ) + 1,
+                    'cost' => strlen($hash) + 1,
                 ]
-            ) ) {
-                return $this->hash( $password, $salt );
+            )) {
+                return $this->hash($password, $salt);
             }
 
             return $hash;
@@ -150,9 +151,9 @@ class Password
      *
      * @return string
      */
-    public function verify( $password, $hash, $salt = null )
+    public function verify($password, $hash, $salt = null)
     {
-        return password_verify( $this->protect( $password, $salt ), $hash );
+        return password_verify($this->protect($password, $salt), $hash);
     }
 
     // ------------------------------------------------------------------------
@@ -167,9 +168,9 @@ class Password
      *
      * @return string
      */
-    protected function protect( $password, $salt = null )
+    protected function protect($password, $salt = null)
     {
-        $salt = isset( $salt )
+        $salt = isset($salt)
             ? $salt
             : $this->salt;
 
@@ -188,9 +189,9 @@ class Password
      *
      * @return string
      */
-    public function hash( $password, $salt = null )
+    public function hash($password, $salt = null)
     {
-        return password_hash( $this->protect( $password, $salt ), $this->algorithm, $this->options );
+        return password_hash($this->protect($password, $salt), $this->algorithm, $this->options);
     }
 
     // ------------------------------------------------------------------------
@@ -202,9 +203,9 @@ class Password
      *
      * @return static
      */
-    protected function setSalt( $salt )
+    protected function setSalt($salt)
     {
-        $this->salt = md5( $salt, true );
+        $this->salt = md5($salt, true);
 
         return $this;
     }

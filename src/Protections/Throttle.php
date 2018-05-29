@@ -42,7 +42,7 @@ class Throttle
 
     public function getConsumerData($consumerId)
     {
-        if(class_exists('\O2System\Framework', false)) {
+        if (class_exists('\O2System\Framework', false)) {
             return cache()->get('throttle-' . $consumerId);
         }
     }
@@ -66,14 +66,14 @@ class Throttle
             $consumerData = $this->repository->get($consumerId);
             $consumerData[ 'id' ] = $consumerId;
             $consumerData[ 'currentCallTime' ] = $request->getTime();
-            $consumerData['attempts'] = 1;
+            $consumerData[ 'attempts' ] = 1;
 
             $this->consumer->merge($consumerData);
         } else {
             $consumerData = $this->consumer->getArrayCopy();
             $consumerData[ 'id' ] = $consumerId;
             $consumerData[ 'lastCallTime' ] = $consumerData[ 'currentCallTime' ] = $request->getTime();
-            $consumerData['attempts'] = $consumerData['attempts'] + 1;
+            $consumerData[ 'attempts' ] = $consumerData[ 'attempts' ] + 1;
 
             $this->repository->store($consumerId, $consumerData);
         }
@@ -86,9 +86,9 @@ class Throttle
 
         $this->consumer[ 'lastCallTime' ] = $currentTime;
 
-        if($timeCall > $this->rate['span']) {
+        if ($timeCall > $this->rate[ 'span' ]) {
             return false;
-        } elseif($this->consumer['attempts'] > $this->rate['attempts']) {
+        } elseif ($this->consumer[ 'attempts' ] > $this->rate[ 'attempts' ]) {
             return false;
         }
 

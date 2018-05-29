@@ -60,23 +60,6 @@ class Repository implements
     // ------------------------------------------------------------------------
 
     /**
-     * Globals__isset
-     *
-     * Implementing magic method __isset to simplify when checks if offset exists on PHP native session variable,
-     * just simply calling isset( $globals[ 'offset' ] ).
-     *
-     * @param mixed $offset PHP native GLOBALS offset.
-     *
-     * @return bool
-     */
-    public function __isset($offset)
-    {
-        return $this->offsetExists($offset);
-    }
-
-    // ------------------------------------------------------------------------
-
-    /**
      * Globals::exists
      *
      * Checks if the data exists on the storage.
@@ -89,6 +72,23 @@ class Repository implements
     public function exists($offset)
     {
         return $this->__isset($offset);
+    }
+
+    // ------------------------------------------------------------------------
+
+    /**
+     * Globals__isset
+     *
+     * Implementing magic method __isset to simplify when checks if offset exists on PHP native session variable,
+     * just simply calling isset( $globals[ 'offset' ] ).
+     *
+     * @param mixed $offset PHP native GLOBALS offset.
+     *
+     * @return bool
+     */
+    public function __isset($offset)
+    {
+        return $this->offsetExists($offset);
     }
 
     // ------------------------------------------------------------------------
@@ -189,20 +189,18 @@ class Repository implements
     // ------------------------------------------------------------------------
 
     /**
-     * Offset to retrieve
+     * Globals::remove
      *
-     * @link  http://php.net/manual/en/arrayaccess.offsetget.php
+     * Removes a data from the storage.
+     * An alias of Globals::__unset method.
      *
-     * @param mixed $offset <p>
-     *                      The offset to retrieve.
-     *                      </p>
+     * @param string $offset The object offset key.
      *
-     * @return mixed Can return all value types.
-     * @since 5.0.0
+     * @return void
      */
-    public function offsetGet($offset)
+    public function remove($offset)
     {
-        return (isset($_SESSION[ 'throttle' ][ $offset ])) ? $_SESSION[ 'throttle' ][ $offset ] : false;
+        $this->__unset($offset);
     }
 
     // ------------------------------------------------------------------------
@@ -241,23 +239,6 @@ class Repository implements
         if (isset($_SESSION[ 'throttle' ][ $offset ])) {
             unset($_SESSION[ 'throttle' ][ $offset ]);
         }
-    }
-
-    // ------------------------------------------------------------------------
-
-    /**
-     * Globals::remove
-     *
-     * Removes a data from the storage.
-     * An alias of Globals::__unset method.
-     *
-     * @param string $offset The object offset key.
-     *
-     * @return void
-     */
-    public function remove($offset)
-    {
-        $this->__unset($offset);
     }
 
     // ------------------------------------------------------------------------
@@ -433,5 +414,24 @@ class Repository implements
     public function has($id)
     {
         return (bool)$this->offsetExists($id);
+    }
+
+    // ------------------------------------------------------------------------
+
+    /**
+     * Offset to retrieve
+     *
+     * @link  http://php.net/manual/en/arrayaccess.offsetget.php
+     *
+     * @param mixed $offset <p>
+     *                      The offset to retrieve.
+     *                      </p>
+     *
+     * @return mixed Can return all value types.
+     * @since 5.0.0
+     */
+    public function offsetGet($offset)
+    {
+        return (isset($_SESSION[ 'throttle' ][ $offset ])) ? $_SESSION[ 'throttle' ][ $offset ] : false;
     }
 }

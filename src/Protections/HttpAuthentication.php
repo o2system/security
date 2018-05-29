@@ -8,6 +8,7 @@
  * @author         Steeve Andrian Salim
  * @copyright      Copyright (c) Steeve Andrian Salim
  */
+
 // ------------------------------------------------------------------------
 
 namespace O2System\Security\Protections;
@@ -80,17 +81,17 @@ class HttpAuthentication
     /**
      * HttpAuthentication::__construct
      */
-    public function __construct( $realm, $type = HttpAuthentication::AUTH_BASIC )
+    public function __construct($realm, $type = HttpAuthentication::AUTH_BASIC)
     {
-        $this->setRealm( $realm )
-            ->setType( $type );
+        $this->setRealm($realm)
+            ->setType($type);
 
-        if ( class_exists( '\O2System\Framework' ) ) {
-            if ( $security = config()->getItem( 'security' ) ) {
-                if ( $security->offsetExists( 'httpAuthentication' ) ) {
-                    $this->users = $security->offsetGet( 'httpAuthentication' );
+        if (class_exists('\O2System\Framework')) {
+            if ($security = config()->getItem('security')) {
+                if ($security->offsetExists('httpAuthentication')) {
+                    $this->users = $security->offsetGet('httpAuthentication');
                 }
-            } elseif ( false !== ( $users = config()->loadFile( 'HttpAuthentication' ) ) ) {
+            } elseif (false !== ($users = config()->loadFile('HttpAuthentication'))) {
                 $this->users = $users;
             }
         }
@@ -107,9 +108,9 @@ class HttpAuthentication
      *
      * @return static
      */
-    public function setType( $type )
+    public function setType($type)
     {
-        if ( in_array( $type, [ self::AUTH_BASIC, self::AUTH_DIGEST ] ) ) {
+        if (in_array($type, [self::AUTH_BASIC, self::AUTH_DIGEST])) {
             $this->type = $type;
         }
 
@@ -127,9 +128,9 @@ class HttpAuthentication
      *
      * @return static
      */
-    public function setRealm( $realm )
+    public function setRealm($realm)
     {
-        $this->realm = trim( $realm );
+        $this->realm = trim($realm);
 
         return $this;
     }
@@ -145,7 +146,7 @@ class HttpAuthentication
      *
      * @return static
      */
-    public function setUsers( array $users )
+    public function setUsers(array $users)
     {
         $this->users = $users;
 
@@ -163,7 +164,7 @@ class HttpAuthentication
      *
      * @return static
      */
-    public function setUsersValidation( \Closure $closure )
+    public function setUsersValidation(\Closure $closure)
     {
         $this->validation = $closure;
 
@@ -181,42 +182,42 @@ class HttpAuthentication
      */
     public function verify()
     {
-        switch ( $this->type ) {
+        switch ($this->type) {
             default:
             case self::AUTH_BASIC:
 
-                if ( $authorization = input()->server( 'HTTP_AUTHORIZATION' ) ) {
-                    $authentication = unserialize( base64_decode( $authorization ) );
-                    if ( $this->login( $authentication[ 'username' ], $authentication[ 'password' ] ) ) {
+                if ($authorization = input()->server('HTTP_AUTHORIZATION')) {
+                    $authentication = unserialize(base64_decode($authorization));
+                    if ($this->login($authentication[ 'username' ], $authentication[ 'password' ])) {
                         return true;
                     }
                 } else {
                     $authentication = $this->parseBasic();
                 }
 
-                if ( $this->login( $authentication[ 'username' ], $authentication[ 'password' ] ) ) {
+                if ($this->login($authentication[ 'username' ], $authentication[ 'password' ])) {
 
-                    header( 'Authorization: Basic ' . base64_encode( serialize( $authentication ) ) );
+                    header('Authorization: Basic ' . base64_encode(serialize($authentication)));
 
                     return true;
                 } else {
-                    unset( $_SERVER[ 'PHP_AUTH_USER' ], $_SERVER[ 'PHP_AUTH_PW' ] );
+                    unset($_SERVER[ 'PHP_AUTH_USER' ], $_SERVER[ 'PHP_AUTH_PW' ]);
                     $this->protect();
                 }
 
                 break;
             case self::AUTH_DIGEST:
-                if ( $authorization = input()->server( 'HTTP_AUTHORIZATION' ) ) {
-                    $authentication = $this->parseDigest( $authorization );
-                } elseif ( $authorization = input()->server( 'PHP_AUTH_DIGEST' ) ) {
-                    $authentication = $this->parseDigest( $authorization );
+                if ($authorization = input()->server('HTTP_AUTHORIZATION')) {
+                    $authentication = $this->parseDigest($authorization);
+                } elseif ($authorization = input()->server('PHP_AUTH_DIGEST')) {
+                    $authentication = $this->parseDigest($authorization);
                 }
 
-                if ( isset( $authentication ) AND
-                    false !== ( $password = $this->login( $authentication[ 'username' ] ) )
+                if (isset($authentication) AND
+                    false !== ($password = $this->login($authentication[ 'username' ]))
                 ) {
-                    $A1 = md5( $authentication[ 'username' ] . ':' . $this->realm . ':' . $password );
-                    $A2 = md5( $_SERVER[ 'REQUEST_METHOD' ] . ':' . $authentication[ 'uri' ] );
+                    $A1 = md5($authentication[ 'username' ] . ':' . $this->realm . ':' . $password);
+                    $A2 = md5($_SERVER[ 'REQUEST_METHOD' ] . ':' . $authentication[ 'uri' ]);
                     $response = md5(
                         $A1
                         . ':'
@@ -231,7 +232,7 @@ class HttpAuthentication
                         . $A2
                     );
 
-                    if ( $authentication[ 'response' ] === $response ) {
+                    if ($authentication[ 'response' ] === $response) {
                         header(
                             sprintf(
                                 'Authorization: Digest username="%s", realm="%s", nonce="%s", uri="%s", qop=%s, nc=%s, cnonce="%s", response="%s", opaque="%s"',
@@ -251,7 +252,7 @@ class HttpAuthentication
                     }
                 }
 
-                unset( $_SERVER[ 'PHP_AUTH_DIGEST' ], $_SERVER[ 'HTTP_AUTHORIZATION' ] );
+                unset($_SERVER[ 'PHP_AUTH_DIGEST' ], $_SERVER[ 'HTTP_AUTHORIZATION' ]);
                 $this->protect();
 
                 break;
@@ -272,17 +273,17 @@ class HttpAuthentication
      *
      * @return bool|string
      */
-    public function login( $username, $password = null )
+    public function login($username, $password = null)
     {
-        switch ( $this->type ) {
+        switch ($this->type) {
             default:
             case self::AUTH_BASIC:
-                if ( isset( $username ) AND isset( $password ) ) {
-                    if ( $this->validation instanceof \Closure ) {
-                        return call_user_func_array( $this->validation, func_get_args() );
+                if (isset($username) AND isset($password)) {
+                    if ($this->validation instanceof \Closure) {
+                        return call_user_func_array($this->validation, func_get_args());
                     } else {
-                        if ( array_key_exists( $username, $this->users ) ) {
-                            if ( $this->users[ $username ] === $password ) {
+                        if (array_key_exists($username, $this->users)) {
+                            if ($this->users[ $username ] === $password) {
                                 return true;
                             }
                         }
@@ -290,11 +291,11 @@ class HttpAuthentication
                 }
                 break;
             case self::AUTH_DIGEST:
-                if ( isset( $username ) ) {
-                    if ( $this->validation instanceof \Closure ) {
-                        return call_user_func_array( $this->validation, func_get_args() );
+                if (isset($username)) {
+                    if ($this->validation instanceof \Closure) {
+                        return call_user_func_array($this->validation, func_get_args());
                     } else {
-                        if ( array_key_exists( $username, $this->users ) ) {
+                        if (array_key_exists($username, $this->users)) {
                             return $this->users[ $username ];
                         }
                     }
@@ -317,8 +318,8 @@ class HttpAuthentication
     protected function parseBasic()
     {
         return [
-            'username' => input()->server( 'PHP_AUTH_USER' ),
-            'password' => input()->server( 'PHP_AUTH_PW' ),
+            'username' => input()->server('PHP_AUTH_USER'),
+            'password' => input()->server('PHP_AUTH_PW'),
         ];
     }
 
@@ -333,17 +334,17 @@ class HttpAuthentication
      */
     protected function protect()
     {
-        header( 'HTTP/1.1 401 Unauthorized' );
+        header('HTTP/1.1 401 Unauthorized');
 
-        switch ( $this->type ) {
+        switch ($this->type) {
             default:
             case self::AUTH_BASIC:
-                header( 'WWW-Authenticate: Basic realm="' . $this->realm . '"' );
+                header('WWW-Authenticate: Basic realm="' . $this->realm . '"');
                 break;
             case self::AUTH_DIGEST:
                 header(
                     'WWW-Authenticate: Digest realm="' . $this->realm .
-                    '", qop="auth", nonce="' . md5( uniqid() ) . '", opaque="' . md5( uniqid() ) . '"'
+                    '", qop="auth", nonce="' . md5(uniqid()) . '", opaque="' . md5(uniqid()) . '"'
                 );
                 break;
         }
@@ -360,20 +361,20 @@ class HttpAuthentication
      *
      * @return array Digest HTTP Authentication data.
      */
-    protected function parseDigest( $digest )
+    protected function parseDigest($digest)
     {
-        $digest = str_replace( 'Digest ', '', $digest );
-        $digest = trim( $digest );
+        $digest = str_replace('Digest ', '', $digest);
+        $digest = trim($digest);
 
-        $parts = explode( ',', $digest );
-        $parts = array_map( 'trim', $parts );
+        $parts = explode(',', $digest);
+        $parts = array_map('trim', $parts);
 
         $data = [];
-        foreach ( $parts as $part ) {
-            $elements = explode( '=', $part );
+        foreach ($parts as $part) {
+            $elements = explode('=', $part);
             $elements = array_map(
-                function ( $element ) {
-                    return trim( str_replace( '"', '', $element ) );
+                function ($element) {
+                    return trim(str_replace('"', '', $element));
 
                 },
                 $elements
@@ -382,7 +383,7 @@ class HttpAuthentication
             $data[ $elements[ 0 ] ] = $elements[ 1 ];
         }
 
-        return empty( $data )
+        return empty($data)
             ? false
             : $data;
     }

@@ -15,7 +15,6 @@ namespace O2System\Security\Protections\Oauth;
 
 // ------------------------------------------------------------------------
 
-use O2System\Security\Protections\Oauth;
 use O2System\Security\Protections\Oauth\Datastructures;
 use O2System\Security\Protections\Oauth\Interfaces\ProviderModelInterface;
 use O2System\Spl\Traits\Collectors\ErrorCollectorTrait;
@@ -184,6 +183,55 @@ class Provider
     // ------------------------------------------------------------------------
 
     /**
+     * Provider::getAccessToken
+     *
+     * Gets OAuth Access Token.
+     *
+     * @return array|bool|\O2System\Security\Protections\Oauth\Datastructures\Token
+     */
+    public function getAccessToken()
+    {
+        if ( ! empty($this->token)) {
+            if ($this->model->insertTokenNonce([
+                'id_consumer_token' => $this->token->id,
+                'nonce'             => $token[ 'nonce' ] = Oauth::generateNonce(),
+                'timestamp'         => $token[ 'timestamp' ] = date('Y-m-d H:m:s'),
+                'expires'           => $token[ 'expires' ] = time() + 3600,
+            ])) {
+                return new Datastructures\Token([
+                    'key'       => $this->token->key,
+                    'secret'    => $this->token->secret,
+                    'nonce'     => $token[ 'nonce' ],
+                    'timestamp' => $token[ 'timestamp' ],
+                    'expires'   => $token[ 'expires' ],
+                    'verifier'  => (new Token($this->token->key, $this->token->secret))->getVerifier(),
+                ]);
+            }
+        }
+
+        $token = $this->generateToken('ACCESS');
+        $token = new Datastructures\Token([
+            'id'       => $token[ 'id' ],
+            'key'      => $token[ 'key' ],
+            'secret'   => $token[ 'secret' ],
+            'verifier' => (new Token($token[ 'key' ], $token[ 'secret' ]))->getVerifier(),
+        ]);
+
+        if ($this->model->insertTokenNonce([
+            'id_consumer_token' => $token[ 'id' ],
+            'nonce'             => $token[ 'nonce' ] = Oauth::generateNonce(),
+            'timestamp'         => $token[ 'timestamp' ] = date('Y-m-d H:m:s'),
+            'expires'           => $token[ 'expires' ] = time() + 3600,
+        ])) {
+            return $token;
+        }
+
+        return false;
+    }
+
+    // ------------------------------------------------------------------------
+
+    /**
      * Provider::generateToken
      *
      * @param string $type
@@ -261,55 +309,6 @@ class Provider
     // ------------------------------------------------------------------------
 
     /**
-     * Provider::getAccessToken
-     *
-     * Gets OAuth Access Token.
-     *
-     * @return array|bool|\O2System\Security\Protections\Oauth\Datastructures\Token
-     */
-    public function getAccessToken()
-    {
-        if ( ! empty($this->token)) {
-            if ($this->model->insertTokenNonce([
-                'id_consumer_token' => $this->token->id,
-                'nonce'             => $token[ 'nonce' ] = Oauth::generateNonce(),
-                'timestamp'         => $token[ 'timestamp' ] = date('Y-m-d H:m:s'),
-                'expires'           => $token[ 'expires' ] = time() + 3600,
-            ])) {
-                return new Datastructures\Token([
-                    'key'       => $this->token->key,
-                    'secret'    => $this->token->secret,
-                    'nonce'     => $token[ 'nonce' ],
-                    'timestamp' => $token[ 'timestamp' ],
-                    'expires'   => $token[ 'expires' ],
-                    'verifier'  => (new Token($this->token->key, $this->token->secret))->getVerifier(),
-                ]);
-            }
-        }
-
-        $token = $this->generateToken('ACCESS');
-        $token = new Datastructures\Token([
-            'id'       => $token[ 'id' ],
-            'key'      => $token[ 'key' ],
-            'secret'   => $token[ 'secret' ],
-            'verifier' => (new Token($token[ 'key' ], $token[ 'secret' ]))->getVerifier(),
-        ]);
-
-        if ($this->model->insertTokenNonce([
-            'id_consumer_token' => $token[ 'id' ],
-            'nonce'             => $token[ 'nonce' ] = Oauth::generateNonce(),
-            'timestamp'         => $token[ 'timestamp' ] = date('Y-m-d H:m:s'),
-            'expires'           => $token[ 'expires' ] = time() + 3600,
-        ])) {
-            return $token;
-        }
-
-        return false;
-    }
-
-    // ------------------------------------------------------------------------
-
-    /**
      * Provider::getRequestToken
      *
      * Gets OAuth Request Token.
@@ -376,7 +375,7 @@ class Provider
         $this->oauth->token = $token;
         $this->oauth->calltokenHandler();
 
-        if(! $this->hasErrors()) {
+        if ( ! $this->hasErrors()) {
             return $this->model->deleteToken(['key' => $token]);
         }
 

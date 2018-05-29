@@ -26,7 +26,7 @@ class Uid
         $ids = str_split(time() . mt_rand());
         shuffle($ids);
 
-        $ids = array_slice($ids,0, $length);
+        $ids = array_slice($ids, 0, $length);
 
         return implode('', $ids);
     }

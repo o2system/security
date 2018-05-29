@@ -15,8 +15,6 @@ namespace O2System\Security\Protections\Oauth;
 
 // ------------------------------------------------------------------------
 
-use O2System\Security\Protections\Oauth;
-
 /**
  * Class Consumer
  * @package O2System\Security\Protections\Oauth
@@ -164,48 +162,6 @@ class Consumer
     // ------------------------------------------------------------------------
 
     /**
-     * Consumer::getAuthorizationBasic
-     *
-     * Gets Consumer HTTP_AUTHORIZATION Bearer code.
-     *
-     * @return bool|string
-     */
-    public function getAuthorizationBasic()
-    {
-        if ( ! empty($this->key) && ! empty($this->secret)) {
-            $key = rawurlencode($this->key);
-            $secret = rawurlencode($this->secret);
-
-            return 'Basic ' . base64_encode($key . ':' . $secret);
-        }
-
-        return false;
-    }
-
-    // ------------------------------------------------------------------------
-
-    /**
-     * Consumer::getAuthorizationBearer
-     *
-     * Gets Consumer HTTP_AUTHORIZATION Bearer code.
-     *
-     * @return bool|string
-     */
-    public function getAuthorizationBearer()
-    {
-        if ( ! empty($this->key) && ! empty($this->secret)) {
-            $key = rawurlencode($this->key);
-            $secret = rawurlencode($this->secret);
-
-            return 'Bearer ' . base64_encode($key . ':' . $secret . ':' . md5($key.$secret));
-        }
-
-        return false;
-    }
-
-    // ------------------------------------------------------------------------
-
-    /**
      * Consumer::getSignature
      *
      * Gets OAuth Consumer Signature.
@@ -256,5 +212,47 @@ class Consumer
                 return hash_hmac('sha256', $signatureBaseString, $this->secret);
                 break;
         }
+    }
+
+    // ------------------------------------------------------------------------
+
+    /**
+     * Consumer::getAuthorizationBasic
+     *
+     * Gets Consumer HTTP_AUTHORIZATION Bearer code.
+     *
+     * @return bool|string
+     */
+    public function getAuthorizationBasic()
+    {
+        if ( ! empty($this->key) && ! empty($this->secret)) {
+            $key = rawurlencode($this->key);
+            $secret = rawurlencode($this->secret);
+
+            return 'Basic ' . base64_encode($key . ':' . $secret);
+        }
+
+        return false;
+    }
+
+    // ------------------------------------------------------------------------
+
+    /**
+     * Consumer::getAuthorizationBearer
+     *
+     * Gets Consumer HTTP_AUTHORIZATION Bearer code.
+     *
+     * @return bool|string
+     */
+    public function getAuthorizationBearer()
+    {
+        if ( ! empty($this->key) && ! empty($this->secret)) {
+            $key = rawurlencode($this->key);
+            $secret = rawurlencode($this->secret);
+
+            return 'Bearer ' . base64_encode($key . ':' . $secret . ':' . md5($key . $secret));
+        }
+
+        return false;
     }
 }

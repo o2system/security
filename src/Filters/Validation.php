@@ -8,6 +8,7 @@
  * @author         Steeve Andrian Salim
  * @copyright      Copyright (c) Steeve Andrian Salim
  */
+
 // ------------------------------------------------------------------------
 
 namespace O2System\Security\Filters;
@@ -28,9 +29,9 @@ class Validation
      *
      * @return bool
      */
-    public static function isRequired( $string = null )
+    public static function isRequired($string = null)
     {
-        if ( empty( $string ) OR strlen( $string ) == 0 ) {
+        if (empty($string) OR strlen($string) == 0) {
             return false;
         }
 
@@ -47,9 +48,9 @@ class Validation
      *
      * @return bool
      */
-    public static function isMatches( $string, $match )
+    public static function isMatches($string, $match)
     {
-        if ( $string === $match ) {
+        if ($string === $match) {
             return true;
         }
 
@@ -68,9 +69,9 @@ class Validation
      *
      * @return    bool
      */
-    public static function isRegexMatch( $string, $regex )
+    public static function isRegexMatch($string, $regex)
     {
-        return (bool)preg_match( $regex, $string );
+        return (bool)preg_match($regex, $string);
     }
 
     // ------------------------------------------------------------------------
@@ -82,9 +83,9 @@ class Validation
      *
      * @return mixed
      */
-    public static function isFloat( $string )
+    public static function isFloat($string)
     {
-        return filter_var( $string, FILTER_VALIDATE_FLOAT );
+        return filter_var($string, FILTER_VALIDATE_FLOAT);
     }
 
     // ------------------------------------------------------------------------
@@ -99,13 +100,13 @@ class Validation
      *
      * @return    bool
      */
-    public static function isMaxLength( $string, $length )
+    public static function isMaxLength($string, $length)
     {
-        if ( ! is_numeric( $length ) ) {
+        if ( ! is_numeric($length)) {
             return false;
         }
 
-        return ( $length >= mb_strlen( $string ) );
+        return ($length >= mb_strlen($string));
     }
 
     // --------------------------------------------------------------------
@@ -120,13 +121,13 @@ class Validation
      *
      * @return    bool
      */
-    public static function isExactLength( $string, $length )
+    public static function isExactLength($string, $length)
     {
-        if ( ! is_numeric( $length ) ) {
+        if ( ! is_numeric($length)) {
             return false;
         }
 
-        return ( mb_strlen( $string ) === (int)$length );
+        return (mb_strlen($string) === (int)$length);
     }
 
     // ------------------------------------------------------------------------
@@ -139,17 +140,17 @@ class Validation
      *
      * @return bool
      */
-    public static function isDimension( $string, $format = 'W x H x L' )
+    public static function isDimension($string, $format = 'W x H x L')
     {
-        $string = strtolower( $string );
-        $string = preg_replace( '/\s+/', '', $string );
-        $x_string = explode( 'x', $string );
+        $string = strtolower($string);
+        $string = preg_replace('/\s+/', '', $string);
+        $x_string = explode('x', $string);
 
-        $format = strtolower( $format );
-        $format = preg_replace( '/\s+/', '', $format );
-        $x_format = explode( 'x', $format );
+        $format = strtolower($format);
+        $format = preg_replace('/\s+/', '', $format);
+        $x_format = explode('x', $format);
 
-        if ( count( $x_string ) == count( $x_format ) ) {
+        if (count($x_string) == count($x_format)) {
             return true;
         }
 
@@ -165,9 +166,9 @@ class Validation
      *
      * @return mixed
      */
-    public static function isIpv4( $string )
+    public static function isIpv4($string)
     {
-        return filter_var( $string, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 );
+        return filter_var($string, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4);
     }
 
     // ------------------------------------------------------------------------
@@ -179,9 +180,9 @@ class Validation
      *
      * @return mixed
      */
-    public static function isIpv6( $string )
+    public static function isIpv6($string)
     {
-        return filter_var( $string, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6 );
+        return filter_var($string, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6);
     }
 
     // ------------------------------------------------------------------------
@@ -193,12 +194,12 @@ class Validation
      *
      * @return bool|mixed
      */
-    public static function isUrl( $string )
+    public static function isUrl($string)
     {
-        if ( preg_match( '/^(?:([^:]*)\:)?\/\/(.+)$/', $string, $matches ) ) {
-            if ( empty( $matches[ 2 ] ) ) {
+        if (preg_match('/^(?:([^:]*)\:)?\/\/(.+)$/', $string, $matches)) {
+            if (empty($matches[ 2 ])) {
                 return false;
-            } elseif ( ! in_array( $matches[ 1 ], [ 'http', 'https' ], true ) ) {
+            } elseif ( ! in_array($matches[ 1 ], ['http', 'https'], true)) {
                 return false;
             }
 
@@ -207,7 +208,7 @@ class Validation
 
         $string = 'http://' . $string;
 
-        return filter_var( $string, FILTER_VALIDATE_URL );
+        return filter_var($string, FILTER_VALIDATE_URL);
     }
 
     // ------------------------------------------------------------------------
@@ -219,13 +220,13 @@ class Validation
      *
      * @return bool
      */
-    public static function isEmail( $string )
+    public static function isEmail($string)
     {
-        if ( function_exists( 'idn_to_ascii' ) && $strpos = strpos( $string, '@' ) ) {
-            $string = substr( $string, 0, ++$strpos ) . idn_to_ascii( substr( $string, $strpos ) );
+        if (function_exists('idn_to_ascii') && $strpos = strpos($string, '@')) {
+            $string = substr($string, 0, ++$strpos) . idn_to_ascii(substr($string, $strpos));
         }
 
-        return (bool)filter_var( $string, FILTER_VALIDATE_EMAIL );
+        return (bool)filter_var($string, FILTER_VALIDATE_EMAIL);
     }
 
     // ------------------------------------------------------------------------
@@ -237,11 +238,11 @@ class Validation
      *
      * @return bool
      */
-    public static function isDomain( $string )
+    public static function isDomain($string)
     {
-        return ( preg_match( "/^([a-z\d](-*[a-z\d])*)(\.([a-z\d](-*[a-z\d])*))*$/i", $string ) //valid chars check
-            && preg_match( "/^.{1,253}$/", $string ) //overall length check
-            && preg_match( "/^[^\.]{1,63}(\.[^\.]{1,63})*$/", $string ) ); //length of each label
+        return (preg_match("/^([a-z\d](-*[a-z\d])*)(\.([a-z\d](-*[a-z\d])*))*$/i", $string) //valid chars check
+            && preg_match("/^.{1,253}$/", $string) //overall length check
+            && preg_match("/^[^\.]{1,63}(\.[^\.]{1,63})*$/", $string)); //length of each label
     }
 
     // ------------------------------------------------------------------------
@@ -253,9 +254,9 @@ class Validation
      *
      * @return bool
      */
-    public static function isBool( $string )
+    public static function isBool($string)
     {
-        return (bool)filter_var( $string, FILTER_VALIDATE_BOOLEAN );
+        return (bool)filter_var($string, FILTER_VALIDATE_BOOLEAN);
     }
 
     // --------------------------------------------------------------------
@@ -267,9 +268,9 @@ class Validation
      *
      * @return    bool
      */
-    public static function isAlpha( $string )
+    public static function isAlpha($string)
     {
-        return (bool)ctype_alpha( $string );
+        return (bool)ctype_alpha($string);
     }
 
     // ------------------------------------------------------------------------
@@ -281,9 +282,9 @@ class Validation
      *
      * @return    bool
      */
-    public static function isAlphaSpaces( $string )
+    public static function isAlphaSpaces($string)
     {
-        return (bool)preg_match( '/^[A-Z ]+$/i', $string );
+        return (bool)preg_match('/^[A-Z ]+$/i', $string);
     }
 
     // --------------------------------------------------------------------
@@ -295,9 +296,9 @@ class Validation
      *
      * @return    bool
      */
-    public static function isAlphaNumeric( $string )
+    public static function isAlphaNumeric($string)
     {
-        return (bool)ctype_alnum( (string)$string );
+        return (bool)ctype_alnum((string)$string);
     }
 
     // --------------------------------------------------------------------
@@ -311,9 +312,9 @@ class Validation
      *
      * @return    bool
      */
-    public static function isAlphaNumericSpaces( $string )
+    public static function isAlphaNumericSpaces($string)
     {
-        return (bool)preg_match( '/^[A-Z0-9 ]+$/i', $string );
+        return (bool)preg_match('/^[A-Z0-9 ]+$/i', $string);
     }
 
     /**
@@ -325,9 +326,9 @@ class Validation
      *
      * @return    bool
      */
-    public static function isAlphaDash( $string )
+    public static function isAlphaDash($string)
     {
-        return (bool)preg_match( '/^[a-z0-9-]+$/i', $string );
+        return (bool)preg_match('/^[a-z0-9-]+$/i', $string);
     }
 
     // ------------------------------------------------------------------------
@@ -341,9 +342,9 @@ class Validation
      *
      * @return    bool
      */
-    public static function isAlphaUnderscore( $string )
+    public static function isAlphaUnderscore($string)
     {
-        return (bool)preg_match( '/^[a-z0-9_]+$/i', $string );
+        return (bool)preg_match('/^[a-z0-9_]+$/i', $string);
     }
 
     // ------------------------------------------------------------------------
@@ -357,9 +358,9 @@ class Validation
      *
      * @return    bool
      */
-    public static function isAlphaUnderscoreDash( $string )
+    public static function isAlphaUnderscoreDash($string)
     {
-        return (bool)preg_match( '/^[a-z0-9_-]+$/i', $string );
+        return (bool)preg_match('/^[a-z0-9_-]+$/i', $string);
     }
 
     // ------------------------------------------------------------------------
@@ -371,9 +372,9 @@ class Validation
      *
      * @return    bool
      */
-    public static function isNumeric( $str )
+    public static function isNumeric($str)
     {
-        return (bool)preg_match( '/^[\-+]?[0-9]*\.?[0-9]+$/', $str );
+        return (bool)preg_match('/^[\-+]?[0-9]*\.?[0-9]+$/', $str);
 
     }
 
@@ -386,9 +387,9 @@ class Validation
      *
      * @return    bool
      */
-    public static function isInteger( $str )
+    public static function isInteger($str)
     {
-        return (bool)preg_match( '/^[\-+]?[0-9]+$/', $str );
+        return (bool)preg_match('/^[\-+]?[0-9]+$/', $str);
     }
 
     // ------------------------------------------------------------------------
@@ -402,9 +403,9 @@ class Validation
      *
      * @return    bool
      */
-    public static function isDecimal( $string )
+    public static function isDecimal($string)
     {
-        return (bool)preg_match( '/^[\-+]?[0-9]+\.[0-9]+$/', $string );
+        return (bool)preg_match('/^[\-+]?[0-9]+\.[0-9]+$/', $string);
     }
 
     // ------------------------------------------------------------------------
@@ -419,9 +420,9 @@ class Validation
      *
      * @return    bool
      */
-    public static function isGreater( $string, $min )
+    public static function isGreater($string, $min)
     {
-        return is_numeric( $string ) ? ( $string > $min ) : false;
+        return is_numeric($string) ? ($string > $min) : false;
     }
 
     // ------------------------------------------------------------------------
@@ -436,9 +437,9 @@ class Validation
      *
      * @return    bool
      */
-    public static function isGreaterEqual( $string, $min )
+    public static function isGreaterEqual($string, $min)
     {
-        return (bool)is_numeric( $string ) ? ( $string >= $min ) : false;
+        return (bool)is_numeric($string) ? ($string >= $min) : false;
     }
 
     // --------------------------------------------------------------------
@@ -453,9 +454,9 @@ class Validation
      *
      * @return    bool
      */
-    public static function isLess( $string, $max )
+    public static function isLess($string, $max)
     {
-        return (bool)is_numeric( $string ) ? ( $string < $max ) : false;
+        return (bool)is_numeric($string) ? ($string < $max) : false;
     }
 
     // --------------------------------------------------------------------
@@ -470,9 +471,9 @@ class Validation
      *
      * @return    bool
      */
-    public static function isLessEqual( $string, $max )
+    public static function isLessEqual($string, $max)
     {
-        return (bool)is_numeric( $string ) ? ( $string <= $max ) : false;
+        return (bool)is_numeric($string) ? ($string <= $max) : false;
     }
 
     // --------------------------------------------------------------------
@@ -487,14 +488,14 @@ class Validation
      *
      * @return    bool
      */
-    public static function isListed( $string, $list )
+    public static function isListed($string, $list)
     {
-        if ( is_string( $list ) ) {
-            $list = explode( ',', $list );
-            $list = array_map( 'trim', $list );
+        if (is_string($list)) {
+            $list = explode(',', $list);
+            $list = array_map('trim', $list);
         }
 
-        return (bool)in_array( $string, $list, true );
+        return (bool)in_array($string, $list, true);
     }
 
     // --------------------------------------------------------------------
@@ -508,9 +509,9 @@ class Validation
      *
      * @return    bool
      */
-    public static function isNatural( $string )
+    public static function isNatural($string)
     {
-        return (bool)ctype_digit( (string)$string );
+        return (bool)ctype_digit((string)$string);
     }
 
     // --------------------------------------------------------------------
@@ -524,9 +525,9 @@ class Validation
      *
      * @return    bool
      */
-    public static function isNaturalNoZero( $string )
+    public static function isNaturalNoZero($string)
     {
-        return (bool)( $string != 0 && ctype_digit( (string)$string ) );
+        return (bool)($string != 0 && ctype_digit((string)$string));
     }
 
     // --------------------------------------------------------------------
@@ -538,9 +539,9 @@ class Validation
      *
      * @return int
      */
-    public static function isMd5( $string )
+    public static function isMd5($string)
     {
-        return preg_match( '/^[a-f0-9]{32}$/i', $string );
+        return preg_match('/^[a-f0-9]{32}$/i', $string);
     }
 
     // --------------------------------------------------------------------
@@ -553,9 +554,9 @@ class Validation
      *
      * @return bool
      */
-    public static function isMsisdn( $string, $leading = '62' )
+    public static function isMsisdn($string, $leading = '62')
     {
-        return (bool)preg_match( '/^(' . $leading . '[1-9]{1}[0-9]{1,2})[0-9]{6,8}$/', $string );
+        return (bool)preg_match('/^(' . $leading . '[1-9]{1}[0-9]{1,2})[0-9]{6,8}$/', $string);
     }
 
     // --------------------------------------------------------------------
@@ -568,11 +569,11 @@ class Validation
      *
      * @return bool
      */
-    public static function isDate( $string, $format = 'Y-m-d' )
+    public static function isDate($string, $format = 'Y-m-d')
     {
-        $dateTime = \DateTime::createFromFormat( $format, $string );
+        $dateTime = \DateTime::createFromFormat($format, $string);
 
-        return (bool)$dateTime !== false && ! array_sum( $dateTime->getLastErrors() );
+        return (bool)$dateTime !== false && ! array_sum($dateTime->getLastErrors());
     }
 
     // --------------------------------------------------------------------
@@ -586,50 +587,50 @@ class Validation
      *
      * @return bool
      */
-    public static function isPassword( $string, $length = 8, $format = 'uppercase, lowercase, number, special' )
+    public static function isPassword($string, $length = 8, $format = 'uppercase, lowercase, number, special')
     {
         // Length
-        if ( self::isMinLength( $string, $length ) === false ) {
+        if (self::isMinLength($string, $length) === false) {
             return false;
         }
 
-        $format = strtolower( $format );
-        $format = explode( ',', $format );
-        $format = array_map( 'trim', $format );
+        $format = strtolower($format);
+        $format = explode(',', $format);
+        $format = array_map('trim', $format);
         $valid = [];
 
-        foreach ( $format as $type ) {
-            switch ( $type ) {
+        foreach ($format as $type) {
+            switch ($type) {
                 case 'uppercase':
-                    if ( preg_match_all( '/[A-Z]/', $string, $uppercase ) ) {
-                        $valid[ $type ] = count( $uppercase[ 0 ] );
+                    if (preg_match_all('/[A-Z]/', $string, $uppercase)) {
+                        $valid[ $type ] = count($uppercase[ 0 ]);
                     }
                     break;
                 case 'lowercase':
-                    if ( preg_match_all( '/[a-z]/', $string, $lowercase ) ) {
-                        $valid[ $type ] = count( $lowercase[ 0 ] );
+                    if (preg_match_all('/[a-z]/', $string, $lowercase)) {
+                        $valid[ $type ] = count($lowercase[ 0 ]);
                     }
                     break;
                 case 'number':
                 case 'numbers':
-                    if ( preg_match_all( '/[0-9]/', $string, $numbers ) ) {
-                        $valid[ $type ] = count( $numbers[ 0 ] );
+                    if (preg_match_all('/[0-9]/', $string, $numbers)) {
+                        $valid[ $type ] = count($numbers[ 0 ]);
                     }
                     break;
                 case 'special character':
                 case 'special-character':
                 case 'special':
                     // Special Characters
-                    if ( preg_match_all( '/[!@#$%^&*()\-_=+{};:,<.>]/', $string, $special ) ) {
-                        $valid[ $type ] = count( $special[ 0 ] );
+                    if (preg_match_all('/[!@#$%^&*()\-_=+{};:,<.>]/', $string, $special)) {
+                        $valid[ $type ] = count($special[ 0 ]);
                     }
                     break;
             }
         }
 
-        $diff = array_diff( $format, array_keys( $valid ) );
+        $diff = array_diff($format, array_keys($valid));
 
-        return empty( $diff ) ? true : false;
+        return empty($diff) ? true : false;
     }
 
     // --------------------------------------------------------------------
@@ -644,14 +645,14 @@ class Validation
      *
      * @return    bool
      */
-    public static function isMinLength( $string, $length )
+    public static function isMinLength($string, $length)
     {
-        if ( isset( $string ) ) {
-            if ( ! is_numeric( $length ) or $length == 0 ) {
+        if (isset($string)) {
+            if ( ! is_numeric($length) or $length == 0) {
                 return false;
             }
 
-            return ( $length <= mb_strlen( $string ) );
+            return ($length <= mb_strlen($string));
         }
 
         return false;
@@ -669,9 +670,9 @@ class Validation
      *
      * @return  bool
      */
-    public static function isValidIp( $string, $which = null )
+    public static function isValidIp($string, $which = null)
     {
-        switch ( strtolower( $which ) ) {
+        switch (strtolower($which)) {
             case 'ipv4':
                 $which = FILTER_FLAG_IPV4;
                 break;
@@ -683,7 +684,7 @@ class Validation
                 break;
         }
 
-        return (bool)filter_var( $string, FILTER_VALIDATE_IP, $which );
+        return (bool)filter_var($string, FILTER_VALIDATE_IP, $which);
     }
 
     // --------------------------------------------------------------------
@@ -697,9 +698,9 @@ class Validation
      *
      * @return  bool
      */
-    public static function isAscii( $string )
+    public static function isAscii($string)
     {
-        return (bool)( preg_match( '/[^\x00-\x7F]/S', $string ) === 0 );
+        return (bool)(preg_match('/[^\x00-\x7F]/S', $string) === 0);
     }
 
     // --------------------------------------------------------------------
@@ -714,8 +715,8 @@ class Validation
      *
      * @return    bool
      */
-    public function isBase64( $string )
+    public function isBase64($string)
     {
-        return (bool)( base64_encode( base64_decode( $string ) ) === $string );
+        return (bool)(base64_encode(base64_decode($string)) === $string);
     }
 }

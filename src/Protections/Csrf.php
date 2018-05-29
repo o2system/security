@@ -8,6 +8,7 @@
  * @author         Steeve Andrian Salim
  * @copyright      Copyright (c) Steeve Andrian Salim
  */
+
 // ------------------------------------------------------------------------
 
 namespace O2System\Security\Protections;
@@ -37,7 +38,7 @@ class Csrf
      */
     public function __construct()
     {
-        if ( false === ( $this->token = $this->getToken() ) ) {
+        if (false === ($this->token = $this->getToken())) {
             $this->regenerate();
         }
     }
@@ -53,7 +54,7 @@ class Csrf
      */
     public function getToken()
     {
-        if ( isset( $_SESSION[ 'csrfToken' ] ) ) {
+        if (isset($_SESSION[ 'csrfToken' ])) {
             return $_SESSION[ 'csrfToken' ];
         }
 
@@ -71,7 +72,7 @@ class Csrf
      */
     public function regenerate()
     {
-        $_SESSION[ 'csrfToken' ] = $this->token = md5( uniqid( mt_rand(), true ) . 'CSRF' );
+        $_SESSION[ 'csrfToken' ] = $this->token = md5(uniqid(mt_rand(), true) . 'CSRF');
     }
 
     // ------------------------------------------------------------------------
@@ -85,13 +86,13 @@ class Csrf
      *
      * @return bool
      */
-    public function verify( $token = null )
+    public function verify($token = null)
     {
-        $token = isset( $token )
+        $token = isset($token)
             ? $token
-            : input()->postGet( 'csrfToken' );
+            : input()->postGet('csrfToken');
 
-        if ( false !== ( $this->getToken() === $token ) ) {
+        if (false !== ($this->getToken() === $token)) {
             return true;
         }
 

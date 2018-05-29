@@ -8,6 +8,7 @@
  * @author         Steeve Andrian Salim
  * @copyright      Copyright (c) Steeve Andrian Salim
  */
+
 // ------------------------------------------------------------------------
 
 namespace O2System\Security\Protections\Oauth\Datastructures;
@@ -30,10 +31,10 @@ class Consumer extends SplArrayObject
     public function __construct(array $consumer = [])
     {
         parent::__construct(array_merge([
-            'id' => null,
-            'key' => null,
+            'id'     => null,
+            'key'    => null,
             'secret' => null,
-            'status' => 'DISABLED'
+            'status' => 'DISABLED',
         ], $consumer));
     }
 

@@ -8,6 +8,7 @@
  * @author         Steeve Andrian Salim
  * @copyright      Copyright (c) Steeve Andrian Salim
  */
+
 // ------------------------------------------------------------------------
 
 namespace O2System\Security\Protections;
@@ -41,13 +42,13 @@ class TokenAuthentication
      *
      * @return bool
      */
-    public function verify( $token = null )
+    public function verify($token = null)
     {
-        $token = isset( $token )
+        $token = isset($token)
             ? $token
-            : input()->server( 'HTTP_X_WEB_TOKEN' );
+            : input()->server('HTTP_X_WEB_TOKEN');
 
-        if ( false !== ( $this->getToken() === $token ) ) {
+        if (false !== ($this->getToken() === $token)) {
             return true;
         }
 
@@ -65,7 +66,7 @@ class TokenAuthentication
      */
     public function getToken()
     {
-        if ( isset( $_SESSION[ 'X-WEB-TOKEN' ] ) ) {
+        if (isset($_SESSION[ 'X-WEB-TOKEN' ])) {
             return $_SESSION[ 'X-WEB-TOKEN' ];
         }
 
@@ -83,10 +84,10 @@ class TokenAuthentication
      *
      * @return static
      */
-    public function setToken( $token )
+    public function setToken($token)
     {
         $_SESSION[ 'X-WEB-TOKEN' ] = $this->token = $token;
-        header( 'X-WEB-TOKEN: ' . $this->token );
+        header('X-WEB-TOKEN: ' . $this->token);
 
         return $this;
     }

@@ -8,6 +8,7 @@
  * @author         Steeve Andrian Salim
  * @copyright      Copyright (c) Steeve Andrian Salim
  */
+
 // ------------------------------------------------------------------------
 
 namespace O2System\Security\Protections;
@@ -35,9 +36,9 @@ class Xss
      */
     public function __construct()
     {
-        $this->config = require( str_replace( 'Protections', 'Config', __DIR__ ) . DIRECTORY_SEPARATOR . 'Xss.php' );
+        $this->config = require(str_replace('Protections', 'Config', __DIR__) . DIRECTORY_SEPARATOR . 'Xss.php');
 
-        if ( false === ( $this->token = $this->getToken() ) ) {
+        if (false === ($this->token = $this->getToken())) {
             $this->regenerate();
         }
     }
@@ -53,7 +54,7 @@ class Xss
      */
     public function getToken()
     {
-        if ( isset( $_SESSION[ 'xssToken' ] ) ) {
+        if (isset($_SESSION[ 'xssToken' ])) {
             return $_SESSION[ 'xssToken' ];
         }
 
@@ -71,7 +72,7 @@ class Xss
      */
     public function regenerate()
     {
-        $_SESSION[ 'xssToken' ] = $this->token = md5( uniqid( mt_rand(), true ) . 'XSS' );
+        $_SESSION[ 'xssToken' ] = $this->token = md5(uniqid(mt_rand(), true) . 'XSS');
     }
 
     // ------------------------------------------------------------------------
@@ -85,13 +86,13 @@ class Xss
      *
      * @return bool
      */
-    public function verify( $token = null )
+    public function verify($token = null)
     {
-        $token = isset( $token )
+        $token = isset($token)
             ? $token
-            : input()->postGet( 'xssToken' );
+            : input()->postGet('xssToken');
 
-        if ( false !== ( $this->getToken() === $token ) ) {
+        if (false !== ($this->getToken() === $token)) {
             return true;
         }
 
@@ -108,19 +109,19 @@ class Xss
      *
      * @return string
      */
-    public function clean( $string, $is_image = false )
+    public function clean($string, $is_image = false)
     {
         // Is the string an array?
-        if ( is_array( $string ) ) {
-            while ( list( $key ) = each( $string ) ) {
-                $string[ $key ] = $this->clean( $string[ $key ] );
+        if (is_array($string)) {
+            while (list($key) = each($string)) {
+                $string[ $key ] = $this->clean($string[ $key ]);
             }
 
             return $string;
         }
 
         // Remove Invisible Characters
-        $string = remove_invisible_characters( $string );
+        $string = remove_invisible_characters($string);
 
         /*
          * URL Decode
@@ -132,8 +133,8 @@ class Xss
          * Note: Use rawurldecode() so it does not remove plus signs
          */
         do {
-            $string = rawurldecode( $string );
-        } while ( preg_match( '/%[0-9a-f]{2,}/i', $string ) );
+            $string = rawurldecode($string);
+        } while (preg_match('/%[0-9a-f]{2,}/i', $string));
 
         /*
          * Convert character entities to ASCII
@@ -144,14 +145,14 @@ class Xss
          */
         $string = preg_replace_callback(
             "/[^a-z0-9>]+[a-z0-9]+=([\'\"]).*?\\1/si",
-            [ $this, 'convertAttribute' ],
+            [$this, 'convertAttribute'],
             $string
         );
 
-        $string = preg_replace_callback( '/<\w+.*/si', [ $this, 'decodeEntity' ], $string );
+        $string = preg_replace_callback('/<\w+.*/si', [$this, 'decodeEntity'], $string);
 
         // Remove Invisible Characters Again!
-        $string = remove_invisible_characters( $string );
+        $string = remove_invisible_characters($string);
 
         /*
          * Convert all tabs to spaces
@@ -161,13 +162,13 @@ class Xss
          * NOTE: preg_replace was found to be amazingly slow here on
          * large blocks of data, so we use str_replace.
          */
-        $string = str_replace( "\t", ' ', $string );
+        $string = str_replace("\t", ' ', $string);
 
         // Capture converted string for later comparison
         $converted_string = $string;
 
         // Remove Strings that are never allowed
-        $string = $this->doNeverAllowed( $string );
+        $string = $this->doNeverAllowed($string);
 
         /*
          * Makes PHP tags safe
@@ -178,13 +179,13 @@ class Xss
          *
          * But it doesn't seem to pose a problem.
          */
-        if ( $is_image === true ) {
+        if ($is_image === true) {
             // Images have a tendency to have the PHP short opening and
             // closing tags every so often so we skip those and only
             // do the long opening tags.
-            $string = preg_replace( '/<\?(php)/i', '&lt;?\\1', $string );
+            $string = preg_replace('/<\?(php)/i', '&lt;?\\1', $string);
         } else {
-            $string = str_replace( [ '<?', '?' . '>' ], [ '&lt;?', '?&gt;' ], $string );
+            $string = str_replace(['<?', '?' . '>'], ['&lt;?', '?&gt;'], $string);
         }
 
         /*
@@ -213,14 +214,14 @@ class Xss
             'eval',
         ];
 
-        foreach ( $words as $word ) {
-            $word = implode( '\s*', str_split( $word ) ) . '\s*';
+        foreach ($words as $word) {
+            $word = implode('\s*', str_split($word)) . '\s*';
 
             // We only want to do this when it is followed by a non-word character
             // That way valid stuff like "dealer to" does not become "dealerto"
             $string = preg_replace_callback(
-                '#(' . substr( $word, 0, -3 ) . ')(\W)#is',
-                [ $this, 'compactExplodedWords' ],
+                '#(' . substr($word, 0, -3) . ')(\W)#is',
+                [$this, 'compactExplodedWords'],
                 $string
             );
         }
@@ -239,25 +240,25 @@ class Xss
          */
         do {
             $original = $string;
-            if ( preg_match( '/<a/i', $string ) ) {
+            if (preg_match('/<a/i', $string)) {
                 $string = preg_replace_callback(
                     '#<a[^a-z0-9>]+([^>]*?)(?:>|$)#si',
-                    [ $this, 'jsLinkRemoval' ],
+                    [$this, 'jsLinkRemoval'],
                     $string
                 );
             }
-            if ( preg_match( '/<img/i', $string ) ) {
+            if (preg_match('/<img/i', $string)) {
                 $string = preg_replace_callback(
                     '#<img[^a-z0-9]+([^>]*?)(?:\s?/?>|$)#si',
-                    [ $this, 'jsImgRemoval' ],
+                    [$this, 'jsImgRemoval'],
                     $string
                 );
             }
-            if ( preg_match( '/script|xss/i', $string ) ) {
-                $string = preg_replace( '#</*(?:script|xss).*?>#si', '[removed]', $string );
+            if (preg_match('/script|xss/i', $string)) {
+                $string = preg_replace('#</*(?:script|xss).*?>#si', '[removed]', $string);
             }
-        } while ( $original !== $string );
-        unset( $original );
+        } while ($original !== $string);
+        unset($original);
 
         /*
          * Sanitize naughty HTML elements
@@ -293,10 +294,10 @@ class Xss
         //       false positives and in turn - vulnerabilities!
         do {
             $old_string = $string;
-            $string = preg_replace_callback( $pattern, [ $this, 'sanitizeNaughtyHTML' ], $string );
-        } while ( $old_string !== $string );
+            $string = preg_replace_callback($pattern, [$this, 'sanitizeNaughtyHTML'], $string);
+        } while ($old_string !== $string);
 
-        unset( $old_string );
+        unset($old_string);
 
         /*
          * Sanitize naughty scripting elements
@@ -319,7 +320,7 @@ class Xss
         // Final clean up
         // This adds a bit of extra precaution in case
         // something got through the above filters
-        $string = $this->doNeverAllowed( $string );
+        $string = $this->doNeverAllowed($string);
 
         /*
          * Images are Handled in a Special Way
@@ -330,8 +331,8 @@ class Xss
          * string post-removal of XSS, then it fails, as there was unwanted XSS
          * code found and removed/changed during processing.
          */
-        if ( $is_image === true ) {
-            return ( $string === $converted_string );
+        if ($is_image === true) {
+            return ($string === $converted_string);
         }
 
         return $string;
@@ -348,16 +349,16 @@ class Xss
      *
      * @return    string
      */
-    protected function doNeverAllowed( $string )
+    protected function doNeverAllowed($string)
     {
         $string = str_replace(
-            array_keys( $this->config[ 'never_allowed_strings' ] ),
+            array_keys($this->config[ 'never_allowed_strings' ]),
             $this->config[ 'never_allowed_strings' ],
             $string
         );
 
-        foreach ( $this->config[ 'never_allowed_regex' ] as $regex ) {
-            $string = preg_replace( '#' . $regex . '#is', '[removed]', $string );
+        foreach ($this->config[ 'never_allowed_regex' ] as $regex) {
+            $string = preg_replace('#' . $regex . '#is', '[removed]', $string);
         }
 
         return $string;
@@ -377,9 +378,9 @@ class Xss
      *
      * @return    string
      */
-    protected function compactExplodedWords( $matches )
+    protected function compactExplodedWords($matches)
     {
-        return preg_replace( '/\s+/s', '', $matches[ 1 ] ) . $matches[ 2 ];
+        return preg_replace('/\s+/s', '', $matches[ 1 ]) . $matches[ 2 ];
     }
 
     // --------------------------------------------------------------------
@@ -395,16 +396,16 @@ class Xss
      *
      * @return    string
      */
-    protected function sanitizeNaughtyHTML( $matches )
+    protected function sanitizeNaughtyHTML($matches)
     {
         // First, escape unclosed tags
-        if ( empty( $matches[ 'closeTag' ] ) ) {
+        if (empty($matches[ 'closeTag' ])) {
             return '&lt;' . $matches[ 1 ];
         } // Is the element that we caught naughty? If so, escape it
-        elseif ( in_array( strtolower( $matches[ 'tagName' ] ), $this->config[ 'naughty_tags' ], true ) ) {
+        elseif (in_array(strtolower($matches[ 'tagName' ]), $this->config[ 'naughty_tags' ], true)) {
             return '&lt;' . $matches[ 1 ] . '&gt;';
         } // For other tags, see if their attributes are "evil" and strip those
-        elseif ( isset( $matches[ 'attributes' ] ) ) {
+        elseif (isset($matches[ 'attributes' ])) {
             // We'll store the already fitlered attributes here
             $attributes = [];
 
@@ -418,25 +419,25 @@ class Xss
                 . '#i';
 
             // Blacklist pattern for evil attribute names
-            $is_evil_pattern = '#^(' . implode( '|', $this->config[ 'evil_attributes' ] ) . ')$#i';
+            $is_evil_pattern = '#^(' . implode('|', $this->config[ 'evil_attributes' ]) . ')$#i';
 
             // Each iteration filters a single attribute
             do {
                 // Strip any non-alpha characters that may preceed an attribute.
                 // Browsers often parse these incorrectly and that has been a
                 // of numerous XSS issues we've had.
-                $matches[ 'attributes' ] = preg_replace( '#^[^a-z]+#i', '', $matches[ 'attributes' ] );
+                $matches[ 'attributes' ] = preg_replace('#^[^a-z]+#i', '', $matches[ 'attributes' ]);
 
-                if ( ! preg_match( $attributes_pattern, $matches[ 'attributes' ], $attribute, PREG_OFFSET_CAPTURE ) ) {
+                if ( ! preg_match($attributes_pattern, $matches[ 'attributes' ], $attribute, PREG_OFFSET_CAPTURE)) {
                     // No (valid) attribute found? Discard everything else inside the tag
                     break;
                 }
 
                 if (
                     // Is it indeed an "evil" attribute?
-                    preg_match( $is_evil_pattern, $attribute[ 'name' ][ 0 ] )
+                    preg_match($is_evil_pattern, $attribute[ 'name' ][ 0 ])
                     // Or does it have an equals sign, but no value and not quoted? Strip that too!
-                    OR ( trim( $attribute[ 'value' ][ 0 ] ) === '' )
+                    OR (trim($attribute[ 'value' ][ 0 ]) === '')
                 ) {
                     $attributes[] = 'xss=removed';
                 } else {
@@ -445,12 +446,12 @@ class Xss
 
                 $matches[ 'attributes' ] = substr(
                     $matches[ 'attributes' ],
-                    $attribute[ 0 ][ 1 ] + strlen( $attribute[ 0 ][ 0 ] )
+                    $attribute[ 0 ][ 1 ] + strlen($attribute[ 0 ][ 0 ])
                 );
-            } while ( $matches[ 'attributes' ] !== '' );
-            $attributes = empty( $attributes )
+            } while ($matches[ 'attributes' ] !== '');
+            $attributes = empty($attributes)
                 ? ''
-                : ' ' . implode( ' ', $attributes );
+                : ' ' . implode(' ', $attributes);
 
             return '<' . $matches[ 'slash' ] . $matches[ 'tagName' ] . $attributes . '>';
         }
@@ -475,14 +476,14 @@ class Xss
      *
      * @return    string
      */
-    protected function jsLinkRemoval( $match )
+    protected function jsLinkRemoval($match)
     {
         return str_replace(
             $match[ 1 ],
             preg_replace(
                 '#href=.*?(?:(?:alert|prompt|confirm)(?:\(|&\#40;)|javascript:|livescript:|mocha:|charset=|window\.|document\.|\.cookie|<script|<xss|data\s*:)#si',
                 '',
-                $this->filterAttributes( str_replace( [ '<', '>' ], '', $match[ 1 ] ) )
+                $this->filterAttributes(str_replace(['<', '>'], '', $match[ 1 ]))
             ),
             $match[ 0 ]
         );
@@ -502,12 +503,12 @@ class Xss
      *
      * @return    string
      */
-    protected function filterAttributes( $str )
+    protected function filterAttributes($str)
     {
         $out = '';
-        if ( preg_match_all( '#\s*[a-z\-]+\s*=\s*(\042|\047)([^\\1]*?)\\1#is', $str, $matches ) ) {
-            foreach ( $matches[ 0 ] as $match ) {
-                $out .= preg_replace( '#/\*.*?\*/#s', '', $match );
+        if (preg_match_all('#\s*[a-z\-]+\s*=\s*(\042|\047)([^\\1]*?)\\1#is', $str, $matches)) {
+            foreach ($matches[ 0 ] as $match) {
+                $out .= preg_replace('#/\*.*?\*/#s', '', $match);
             }
         }
 
@@ -531,14 +532,14 @@ class Xss
      *
      * @return    string
      */
-    protected function jsImgRemoval( $match )
+    protected function jsImgRemoval($match)
     {
         return str_replace(
             $match[ 1 ],
             preg_replace(
                 '#src=.*?(?:(?:alert|prompt|confirm)(?:\(|&\#40;)|javascript:|livescript:|mocha:|charset=|window\.|document\.|\.cookie|<script|<xss|base64\s*,)#si',
                 '',
-                $this->filterAttributes( str_replace( [ '<', '>' ], '', $match[ 1 ] ) )
+                $this->filterAttributes(str_replace(['<', '>'], '', $match[ 1 ]))
             ),
             $match[ 0 ]
         );
@@ -555,9 +556,9 @@ class Xss
      *
      * @return    string
      */
-    protected function convertAttribute( $match )
+    protected function convertAttribute($match)
     {
-        return str_replace( [ '>', '<', '\\' ], [ '&gt;', '&lt;', '\\\\' ], $match[ 0 ] );
+        return str_replace(['>', '<', '\\'], ['&gt;', '&lt;', '\\\\'], $match[ 0 ]);
     }
 
     // ------------------------------------------------------------------------
@@ -571,17 +572,17 @@ class Xss
      *
      * @return    string
      */
-    protected function decodeEntity( $match )
+    protected function decodeEntity($match)
     {
         // Protect GET variables in URLs
         // 901119URL5918AMP18930PROTECT8198
-        $match = preg_replace( '|\&([a-z\_0-9\-]+)\=([a-z\_0-9\-/]+)|i', $this->token . '\\1=\\2', $match[ 0 ] );
+        $match = preg_replace('|\&([a-z\_0-9\-]+)\=([a-z\_0-9\-/]+)|i', $this->token . '\\1=\\2', $match[ 0 ]);
 
         // Decode, then un-protect URL GET vars
         return str_replace(
             $this->token,
             '&',
-            $this->entityDecode( $match, config()->getItem( 'charset' ) )
+            $this->entityDecode($match, config()->getItem('charset'))
         );
     }
 
@@ -605,47 +606,47 @@ class Xss
      *
      * @return    string
      */
-    protected function entityDecode( $string, $charset = null )
+    protected function entityDecode($string, $charset = null)
     {
-        if ( strpos( $string, '&' ) === false ) {
+        if (strpos($string, '&') === false) {
             return $string;
         }
 
         static $_entities;
 
-        isset( $charset ) || $charset = config()->getItem( 'charset' );
+        isset($charset) || $charset = config()->getItem('charset');
         $flag = ENT_COMPAT | ENT_HTML5;
 
         do {
             $str_compare = $string;
 
             // Decode standard entities, avoiding false positives
-            if ( $c = preg_match_all( '/&[a-z]{2,}(?![a-z;])/i', $string, $matches ) ) {
-                if ( ! isset( $_entities ) ) {
+            if ($c = preg_match_all('/&[a-z]{2,}(?![a-z;])/i', $string, $matches)) {
+                if ( ! isset($_entities)) {
                     $_entities = array_map(
                         'strtolower',
-                        get_html_translation_table( HTML_ENTITIES, $flag )
+                        get_html_translation_table(HTML_ENTITIES, $flag)
                     );
                 }
 
                 $replace = [];
-                $matches = array_unique( array_map( 'strtolower', $matches[ 0 ] ) );
-                for ( $i = 0; $i < $c; $i++ ) {
-                    if ( ( $char = array_search( $matches[ $i ] . ';', $_entities, true ) ) !== false ) {
+                $matches = array_unique(array_map('strtolower', $matches[ 0 ]));
+                for ($i = 0; $i < $c; $i++) {
+                    if (($char = array_search($matches[ $i ] . ';', $_entities, true)) !== false) {
                         $replace[ $matches[ $i ] ] = $char;
                     }
                 }
 
-                $string = str_ireplace( array_keys( $replace ), array_values( $replace ), $string );
+                $string = str_ireplace(array_keys($replace), array_values($replace), $string);
             }
 
             // Decode numeric & UTF16 two byte entities
             $string = html_entity_decode(
-                preg_replace( '/(&#(?:x0*[0-9a-f]{2,5}(?![0-9a-f;])|(?:0*\d{2,4}(?![0-9;]))))/iS', '$1;', $string ),
+                preg_replace('/(&#(?:x0*[0-9a-f]{2,5}(?![0-9a-f;])|(?:0*\d{2,4}(?![0-9;]))))/iS', '$1;', $string),
                 $flag,
                 $charset
             );
-        } while ( $str_compare !== $string );
+        } while ($str_compare !== $string);
 
         return $string;
     }
