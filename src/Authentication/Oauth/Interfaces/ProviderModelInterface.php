@@ -11,13 +11,13 @@
 
 // ------------------------------------------------------------------------
 
-namespace O2System\Security\Protections\Oauth\Interfaces;
+namespace O2System\Security\Authentication\Oauth\Interfaces;
 
 // ------------------------------------------------------------------------
 
 /**
  * Interface ProviderModelInterface
- * @package O2System\Security\Protections\Oauth\Interfaces
+ * @package O2System\Security\Authentication\Oauth\Interfaces
  */
 interface ProviderModelInterface
 {

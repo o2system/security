@@ -11,16 +11,16 @@
 
 // ------------------------------------------------------------------------
 
-namespace O2System\Security\Protections;
+namespace O2System\Security\Authentication;
 
 // ------------------------------------------------------------------------
 
 /**
  * Class HttpAuthentication
  *
- * @package O2System\Security\Protections
+ * @package O2System\Security\Authentication
  */
-class HttpAuthentication
+class Http
 {
     /**
      * HttpAuthentication::AUTH_BASIC

@@ -41,14 +41,14 @@ class Validation
     // ------------------------------------------------------------------------
 
     /**
-     * Validation::isMatches
+     * Validation::isMatch
      *
      * @param $string
      * @param $match
      *
      * @return bool
      */
-    public static function isMatches($string, $match)
+    public static function isMatch($string, $match)
     {
         if ($string === $match) {
             return true;
@@ -222,10 +222,6 @@ class Validation
      */
     public static function isEmail($string)
     {
-        if (function_exists('idn_to_ascii') && $strpos = strpos($string, '@')) {
-            $string = substr($string, 0, ++$strpos) . idn_to_ascii(substr($string, $strpos));
-        }
-
         return (bool)filter_var($string, FILTER_VALIDATE_EMAIL);
     }
 

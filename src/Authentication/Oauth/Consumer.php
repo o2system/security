@@ -11,13 +11,13 @@
 
 // ------------------------------------------------------------------------
 
-namespace O2System\Security\Protections\Oauth;
+namespace O2System\Security\Authentication\Oauth;
 
 // ------------------------------------------------------------------------
 
 /**
  * Class Consumer
- * @package O2System\Security\Protections\Oauth
+ * @package O2System\Security\Authentication\Oauth
  */
 class Consumer
 {
@@ -133,11 +133,11 @@ class Consumer
         $signatureMethod = OAUTH_SIG_METHOD_HMACSHA1;
 
         $parameters = [
-            'oauth_nonce'            => Oauth::generateNonce(),
+            'oauth_nonce'            => Nonce::generate($signatureMethod),
             'oauth_signature_method' => $signatureMethod,
             'oauth_timestamp'        => time(),
             'oauth_consumer_key'     => $this->key,
-            'oauth_version'          => Oauth::VERSION,
+            'oauth_version'          => '1.0',
         ];
 
         if (isset($httpUrl)) {
@@ -152,6 +152,7 @@ class Consumer
             $parameters[ 'callback' ] = $this->callbackUrl;
         }
 
+        $parts = [];
         foreach ($parameters as $key => $value) {
             $parts[] = $key . '="' . $value . '"';
         }

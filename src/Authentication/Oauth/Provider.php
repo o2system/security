@@ -11,17 +11,17 @@
 
 // ------------------------------------------------------------------------
 
-namespace O2System\Security\Protections\Oauth;
+namespace O2System\Security\Authentication\Oauth;
 
 // ------------------------------------------------------------------------
 
-use O2System\Security\Protections\Oauth\Datastructures;
-use O2System\Security\Protections\Oauth\Interfaces\ProviderModelInterface;
+use O2System\Security\Authentication\Oauth\Datastructures;
+use O2System\Security\Authentication\Oauth\Interfaces\ProviderModelInterface;
 use O2System\Spl\Traits\Collectors\ErrorCollectorTrait;
 
 /**
  * Class Provider
- * @package O2System\Security\Protections\Oauth
+ * @package O2System\Security\Authentication\Oauth
  */
 class Provider
 {
@@ -37,21 +37,21 @@ class Provider
     /**
      * Provider::$consumer
      *
-     * @var \O2System\Security\Protections\Oauth\Datastructures\Consumer
+     * @var \O2System\Security\Authentication\Oauth\Datastructures\Consumer
      */
     protected $consumer;
 
     /**
      * Provider::$token
      *
-     * @var \O2System\Security\Protections\Oauth\Datastructures\Token
+     * @var \O2System\Security\Authentication\Oauth\Datastructures\Token
      */
     protected $token;
 
     /**
      * Provider::$model
      *
-     * @var \O2System\Security\Protections\Oauth\Interfaces\ProviderModelInterface
+     * @var \O2System\Security\Authentication\Oauth\Interfaces\ProviderModelInterface
      */
     protected $model;
 
@@ -63,7 +63,7 @@ class Provider
     public function __construct()
     {
         language()
-            ->addFilePath(str_replace('Protections' . DIRECTORY_SEPARATOR . 'Oauth', '', __DIR__) . DIRECTORY_SEPARATOR)
+            ->addFilePath(str_replace('Authentication' . DIRECTORY_SEPARATOR . 'Oauth', '', __DIR__) . DIRECTORY_SEPARATOR)
             ->loadFile('oauth');
 
         $this->oauth = new \OAuthProvider([
@@ -187,7 +187,7 @@ class Provider
      *
      * Gets OAuth Access Token.
      *
-     * @return array|bool|\O2System\Security\Protections\Oauth\Datastructures\Token
+     * @return array|bool|\O2System\Security\Authentication\Oauth\Datastructures\Token
      */
     public function getAccessToken()
     {

@@ -11,15 +11,22 @@
 
 // ------------------------------------------------------------------------
 
-namespace O2System\Security\Protections;
+namespace O2System\Security\Authentication\User;
 
 // ------------------------------------------------------------------------
 
-/**
- * Class OriginAuthentication
- * @package O2System\Security\Protections
- */
-class OriginAuthentication
-{
+use O2System\Psr\Patterns\Structural\Repository\AbstractRepository;
 
+/**
+ * Class Role
+ * @package O2System\Security\Authentication\User
+ */
+class Role extends AbstractRepository
+{
+    public function __construct(array $role)
+    {
+        foreach($role as $key => $value) {
+            $this->store($key, $value);
+        }
+    }
 }

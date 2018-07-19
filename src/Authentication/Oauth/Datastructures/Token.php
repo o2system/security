@@ -11,45 +11,45 @@
 
 // ------------------------------------------------------------------------
 
-namespace O2System\Security\Protections\Oauth\Datastructures;
+namespace O2System\Security\Authentication\Oauth\Datastructures;
 
 // ------------------------------------------------------------------------
 
 use O2System\Spl\Datastructures\SplArrayObject;
 
 /**
- * Class Consumer
- * @package O2System\Security\Protections\Oauth\Datastructures
+ * Class Token
+ * @package O2System\Security\Authentication\Oauth\Datastructures
  */
-class Consumer extends SplArrayObject
+class Token extends SplArrayObject
 {
     /**
-     * Consumer::__construct
+     * Token::__construct
      *
-     * @param array $consumer
+     * @param array $token
      */
-    public function __construct(array $consumer = [])
+    public function __construct(array $token = [])
     {
         parent::__construct(array_merge([
-            'id'     => null,
             'key'    => null,
             'secret' => null,
-            'status' => 'DISABLED',
-        ], $consumer));
+            'type'   => 'Bearer',
+        ], $token));
     }
 
     // ------------------------------------------------------------------------
 
     /**
-     * Consumer::__toString
+     * Token::__toString
      *
-     * Generates the basic string serialization of http query string.
+     * Generates the basic string serialization of a token that a server
+     * would respond to request_token and access_token calls with
      *
      * @return string
      */
     public function __toString()
     {
-        return sprintf("oauth_consumer_key=%s&oauth_consumer_secret=%s",
+        return sprintf("oauth_token=%s&oauth_token_secret=%s",
             rawurlencode($this->key),
             rawurlencode($this->secret)
         );

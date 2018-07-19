@@ -11,16 +11,16 @@
 
 // ------------------------------------------------------------------------
 
-namespace O2System\Security\Protections;
+namespace O2System\Security\Authentication;
 
 // ------------------------------------------------------------------------
 
 /**
  * Class TokenAuthentication
  *
- * @package O2System\Security\Protections
+ * @package O2System\Security\Authentication
  */
-class TokenAuthentication
+class WebToken
 {
     /**
      * TokenAuthentication::$token

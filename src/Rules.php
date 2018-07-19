@@ -58,7 +58,8 @@ class Rules
     {
         language()
             ->addFilePath(__DIR__ . DIRECTORY_SEPARATOR)
-            ->loadFile('rules');
+            ->loadFile('rules')
+            ->loadFile('validation');
 
         $this->customErrors = [
             'required'  => language()->getLine('SECURITY_RULES_E_REQUIRED'),
@@ -178,82 +179,95 @@ class Rules
             return false;
         }
 
-        foreach ($this->rules as $field => $rule) {
+        foreach ($this->rules as $fieldName => $fieldParams) {
 
             /* Throw exception if existed rules field not yet exists in data source */
-            if ( ! array_key_exists($field, $this->sourceVars)) {
+            if ( ! array_key_exists($fieldName, $this->sourceVars)) {
                 throw new OutOfRangeException('SECURITY_RULES_E_HEADER_OUTOFRANGEEXCEPTION', 1);
             }
 
-            if (is_string($rule[ 'rules' ])) {
-                /* Explode rules by | as delimiter */
-                $xRule = explode('|', $rule[ 'rules' ]);
+            if (is_string($fieldParams[ 'rules' ])) {
+                /**
+                 * Explode field rules by | as delimiter
+                 */
+                $fieldRules = explode('|', $fieldParams[ 'rules' ]);
 
-                foreach ($xRule as $method) {
-                    $validationClass = new Validation;
-
+                foreach ($fieldRules as $fieldRuleMethod) {
                     /* Get parameter from given data */
-                    $methodParams = $this->sourceVars[ $field ];
-                    if ( ! is_array($methodParams)) {
-                        $methodParams = [$methodParams];
+                    $fieldValue = $this->sourceVars[ $fieldName ];
+                    if ( ! is_array($fieldValue)) {
+                        $fieldValue = [$fieldValue];
                     }
 
-                    if (empty($methodParams)) {
-                        array_unshift($methodParams, null);
+                    if (empty($fieldValue)) {
+                        array_unshift($fieldValue, null);
                     }
 
                     /* Check if rules has parameter */
-                    if (preg_match_all("/\[(.*)\]/", $method, $ruleParams)) {
+                    if (preg_match_all("/\[(.*)\]/", $fieldRuleMethod, $fieldRuleParams)) {
 
                         /* Remove [] from method */
-                        $method = preg_replace("/\[.*\]/", '', $method);
+                        $fieldRuleMethod = preg_replace("/\[.*\]/", '', $fieldRuleMethod);
 
                         /* Explode rule parameter */
-                        $ruleParams = explode(',', preg_replace("/,[ ]+/", ',', $ruleParams[ 1 ][ 0 ]));
+                        $fieldRuleParams = explode(',', preg_replace("/,[ ]+/", ',', $fieldRuleParams[ 1 ][ 0 ]));
 
-                        /* Merge method's param with rule's param */
-                        $methodParams = array_merge($methodParams, $ruleParams);
-                    }
-
-                    $method = 'is' . studlycase($method);
-
-                    /* Throw exception if method not exists in validation class */
-                    if ( ! method_exists($validationClass, $method)) {
-                        throw new BadMethodCallException('SECURITY_RULES_E_HEADER_BADMETHODCALLEXCEPTION', 1);
-                    }
-
-                    $validate = call_user_func_array([&$validationClass, $method], $methodParams);
-
-                    if ( ! $validate) {
-                        /* Reverse method name to lower case */
-                        $methodName = lcfirst(str_replace('is', '', $method));
-
-                        if ( ! empty($rule[ 'messages' ])) {
-                            $message = $rule[ 'messages' ];
-
-                            /* If $rule message is array, replace $message with specified message */
-                            if (is_array($rule[ 'messages' ])) {
-                                if (isset($rule[ 'messages' ][ $methodName ])) {
-                                    $message = $rule[ 'messages' ][ $methodName ];
-                                } else {
-                                    $message = $rule[ 'messages' ][ $field ];
+                        if($fieldRuleMethod === 'match') {
+                            foreach($fieldRuleParams as $fieldRuleParamKey => $fieldRuleParamValue) {
+                                if(array_key_exists($fieldRuleParamValue, $this->sourceVars)) {
+                                    $fieldRuleParams[ $fieldRuleParamKey ] = $this->sourceVars[ $fieldRuleParamValue ];
                                 }
                             }
-                        } elseif (array_key_exists($field, $this->customErrors)) {
-                            $message = $this->customErrors[ $field ];
-                        } elseif (array_key_exists($methodName, $this->customErrors)) {
-                            $message = $this->customErrors[ $methodName ];
+                        } elseif($fieldRuleMethod === 'listed') {
+                            $fieldRuleParams = [ $fieldRuleParams ];
+                        }
+
+                        /* Merge method's param with field rule's params */
+                        $fieldValue = array_merge($fieldValue, $fieldRuleParams);
+                    }
+
+                    $validationClass = new Validation;
+                    $validationMethod = 'is' . studlycase($fieldRuleMethod);
+                    $validationStatus = false;
+
+                    /* Throw exception if method not exists in validation class */
+                    if (method_exists($validationClass, $validationMethod)) {
+                        $validationStatus = call_user_func_array([&$validationClass, $validationMethod], $fieldValue);
+                    } elseif(function_exists($fieldRuleMethod)) {
+                        $validationStatus = call_user_func_array($fieldRuleMethod, $fieldValue);
+                    } elseif(is_callable($fieldRuleMethod)) {
+                        $validationStatus = call_user_func_array($fieldRuleMethod, $fieldValue);
+                    }
+
+                    if ($validationStatus === false) {
+                        if ( ! empty($fieldParams[ 'messages' ])) {
+                            $message = $fieldParams[ 'messages' ];
+
+                            /* If $rule message is array, replace $message with specified message */
+                            if (is_array($fieldParams[ 'messages' ])) {
+                                if (isset($fieldParams[ 'messages' ][ $fieldRuleMethod ])) {
+                                    $message = $fieldParams[ 'messages' ][ $fieldRuleMethod ];
+                                } else {
+                                    $message = $fieldParams[ 'messages' ][ $fieldName ];
+                                }
+                            }
+                        } elseif (array_key_exists($fieldName, $this->customErrors)) {
+                            $message = $this->customErrors[ $fieldName ];
+                        } elseif (array_key_exists($fieldRuleMethod, $this->customErrors)) {
+                            $message = $this->customErrors[ $fieldRuleMethod ];
                         } else {
-                            $message = strtoupper('is_' . join('', explode('is', $method)));
+                            $message = 'RULE_' . strtoupper($fieldRuleMethod);
                         }
 
                         /* Replace message placeholder, :attribute, :params */
-                        $message = str_replace(':attribute', (isset($rule['label']) ? $rule['label'] : $field), $message);
-                        if (isset($ruleParams) AND ! empty($ruleParams[ 0 ])) {
-                            $message = str_replace(':params', implode(',', $ruleParams), $message);
+                        $message = str_replace(':attribute',
+                            (isset($fieldParams[ 'label' ]) ? $fieldParams[ 'label' ] : $fieldName), $message);
+                        if (isset($fieldRuleParams) AND ! empty($fieldRuleParams[ 0 ])) {
+                            $message = str_replace(':params', implode(',', $fieldRuleParams), $message);
                         }
 
-                        $this->setError($message, $methodParams);
+                        $this->setFieldError($fieldName, language($fieldParams[ 'label' ]),
+                            language($message, [$fieldValue]));
                     }
 
                 }
@@ -265,27 +279,12 @@ class Rules
 
     // --------------------------------------------------------------------------------------
 
-    /**
-     * Validation::setError
-     *
-     * @param       $error
-     * @param array $vars
-     */
-    protected function setError($error, $vars = [])
+    protected function setFieldError($field, $label, $message)
     {
-        if (array_key_exists($error, $this->customErrors)) {
-            $error = $this->customErrors[ $error ];
-        } else {
-            language()->loadFile('validation');
-            $line = language()->getLine($error);
-
-            if ( ! empty($line)) {
-                $error = $line;
-            }
-        }
-
-        array_unshift($vars, $error);
-        $this->errors[] = call_user_func_array('sprintf', $vars);
+        $this->errors[ $field ] = [
+            'label'   => $label,
+            'message' => $message,
+        ];
     }
 
     // --------------------------------------------------------------------------------------
@@ -294,8 +293,8 @@ class Rules
     {
         $ul = new Unordered();
 
-        foreach($this->getErrors() as $error) {
-            $ul->createList($error);
+        foreach ($this->getErrors() as $field => $errorParams) {
+            $ul->createList($errorParams[ 'label' ] . ': ' . $errorParams[ 'message' ]);
         }
 
         return $ul->render();

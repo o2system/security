@@ -11,13 +11,13 @@
 
 // ------------------------------------------------------------------------
 
-namespace O2System\Security\Protections\Oauth;
+namespace O2System\Security\Authentication\Oauth;
 
 // ------------------------------------------------------------------------
 
 /**
  * Class Token
- * @package O2System\Security\Protections\Oauth
+ * @package O2System\Security\Authentication\Oauth
  */
 class Token
 {
