@@ -121,7 +121,7 @@ class Cookie
             $value,
             $this->options[ 'expire' ],
             $this->options[ 'path' ],
-            $this->options[ 'domain' ],
+            '.' . ltrim($this->options[ 'domain' ], '.'),
             false,
             false
         );
