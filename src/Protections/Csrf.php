@@ -72,7 +72,7 @@ class Csrf
      */
     public function regenerate()
     {
-        $_SESSION[ 'csrfToken' ] = $this->token = md5(uniqid(mt_rand(), true) . 'CSRF');
+        $_SESSION[ 'csrfToken' ] = $this->token = 'CSRF-' . bin2hex(random_bytes(32));
     }
 
     // ------------------------------------------------------------------------
@@ -92,10 +92,6 @@ class Csrf
             ? $token
             : input()->postGet('csrfToken');
 
-        if (false !== ($this->getToken() === $token)) {
-            return true;
-        }
-
-        return false;
+        return hash_equals($this->getToken(), $token);
     }
 }

@@ -165,10 +165,6 @@ class Captcha
             ? $token
             : input()->postGet('captchaToken');
 
-        if (false !== ($this->getToken() === $token)) {
-            return true;
-        }
-
-        return false;
+        return hash_equals($this->getToken(), $token);
     }
 }
