@@ -16,70 +16,23 @@ namespace O2System\Security\Authentication;
 // ------------------------------------------------------------------------
 
 /**
- * Class TokenAuthentication
+ * Class WebToken
  *
  * @package O2System\Security\Authentication
  */
 class WebToken
 {
     /**
-     * TokenAuthentication::$token
-     *
-     * X-WEB-TOKEN protection token.
-     *
-     * @var string
-     */
-    private $token;
-
-    // ------------------------------------------------------------------------
-
-    /**
-     * TokenAuthentication::setToken
-     *
-     * Sets X-WEB-TOKEN protection token.
-     *
-     * @param string $token X-WEB-TOKEN protection token.
-     *
-     * @return static
-     */
-    public function setToken($token)
-    {
-        $_SESSION[ 'X-WEB-TOKEN' ] = $this->token = $token;
-        header('X-WEB-TOKEN: ' . $this->token);
-
-        return $this;
-    }
-
-    // ------------------------------------------------------------------------
-
-    /**
-     * TokenAuthentication::getToken
-     *
-     * Gets X-WEB-TOKEN protection token.
-     *
-     * @return string|bool Returns FALSE if X-WEB-TOKEN protection token is not set.
-     */
-    public function getToken()
-    {
-        if (isset($_SESSION[ 'X-WEB-TOKEN' ])) {
-            return $_SESSION[ 'X-WEB-TOKEN' ];
-        }
-
-        return false;
-    }
-
-    // ------------------------------------------------------------------------
-
-    /**
-     * TokenAuthentication::verify
+     * WebToken::verify
      *
      * Checks if the posted X-WEB-TOKEN protection token is valid.
      *
-     * @param string $token X-WEB-TOKEN protection token.
+     * @param string   $token    X-WEB-TOKEN protection token.
+     * @param \Closure $callback Callback verification process.
      *
      * @return bool
      */
-    public function verify($token = null)
+    public function verify($token = null, \Closure $callback)
     {
         $token = isset($token)
             ? $token
@@ -87,8 +40,8 @@ class WebToken
 
         if(is_null($token)) {
             return false;
-        } elseif(false !== ($verifierToken = $this->getToken())) {
-            return hash_equals($verifierToken, $token);
+        } elseif(is_callable($callback)) {
+            return call_user_func($callback, $token);
         }
 
         return false;
