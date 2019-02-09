@@ -1,43 +1,42 @@
 <?php
 /**
- * This file is part of the O2System PHP Framework package.
+ * This file is part of the O2System Framework package.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  *
- * @author         Mohamad Rafi Randoni
+ * @author         Steeve Andrian Salim
  * @copyright      Copyright (c) Steeve Andrian Salim
  */
 
 // ------------------------------------------------------------------------
 
-namespace O2System\Security;
+namespace O2System\Security\Filters;
 
-use O2System\Framework\Libraries\Ui\Contents\Lists\Unordered;
-use O2System\Security\Filters\Validation;
-use O2System\Spl\Exceptions\Logic\BadFunctionCall\BadMethodCallException;
+// ------------------------------------------------------------------------
+
 use O2System\Spl\Exceptions\Logic\OutOfRangeException;
 use O2System\Spl\Traits\Collectors\ErrorCollectorTrait;
 
 /**
  * Class Rules
  *
- * @package O2System\Security
+ * @package O2System\Security\Filters
  */
 class Rules
 {
     use ErrorCollectorTrait;
 
     /**
-     * Validation Rules
+     * Rules Clauses
      *
      * @access  protected
      * @type    array
      */
-    protected $rules = [];
+    protected $clauses = [];
 
     /**
-     * Validation Messages
+     * Rules Custom Error Messages
      *
      * @access  protected
      * @type    array
@@ -54,6 +53,11 @@ class Rules
 
     // ------------------------------------------------------------------------
 
+    /**
+     * Rules::__construct
+     *
+     * @param array $sourceVars
+     */
     public function __construct($sourceVars = [])
     {
         language()
@@ -80,11 +84,10 @@ class Rules
         }
     }
 
-    /**Validation::setSource
+    /**
+     * Rules::setSource
      *
      * @param array $sourceVars
-     *
-     * @access  public
      */
     public function setSource(array $sourceVars)
     {
@@ -94,7 +97,7 @@ class Rules
     // --------------------------------------------------------------------------------------
 
     /**
-     * Add source
+     * Rules::addSource
      *
      * @param string $key
      * @param string $value
@@ -107,30 +110,30 @@ class Rules
     // --------------------------------------------------------------------
 
     /**
-     * Validation::addRules
+     * Rules::sets
      *
      * @param array $rules
      */
-    public function addRules(array $rules)
+    public function sets(array $rules)
     {
         foreach ($rules as $rule) {
-            $this->addRule($rule[ 'field' ], $rule[ 'label' ], $rule[ 'rules' ], $rule[ 'messages' ]);
+            $this->add($rule[ 'field' ], $rule[ 'label' ], $rule[ 'rules' ], $rule[ 'messages' ]);
         }
     }
 
     // --------------------------------------------------------------------
 
     /**
-     * Validation::addRule
+     * Rules::add
      *
-     * @param       $field
-     * @param       $label
-     * @param       $rules
-     * @param array $messages
+     * @param string $field
+     * @param string $label
+     * @param string $rules
+     * @param array  $messages
      */
-    public function addRule($field, $label, $rules, $messages = [])
+    public function add($field, $label, $rules, $messages = [])
     {
-        $this->rules[ $field ] = [
+        $this->clauses[ $field ] = [
             'field'    => $field,
             'label'    => $label,
             'rules'    => $rules,
@@ -141,15 +144,15 @@ class Rules
     // --------------------------------------------------------------------
 
     /**
-     * Validation::hasRule
+     * Rules::has
      *
      * @param $field
      *
      * @return bool
      */
-    public function hasRule($field)
+    public function has($field)
     {
-        if (array_key_exists($field, $this->rules)) {
+        if (array_key_exists($field, $this->clauses)) {
             return true;
         }
 
@@ -159,10 +162,10 @@ class Rules
     // ------------------------------------------------------------------------
 
     /**
-     * Validation::setMessage
+     * Rules::setMessage
      *
-     * @param $field
-     * @param $message
+     * @param string $field
+     * @param string $message
      */
     public function setMessage($field, $message)
     {
@@ -171,6 +174,12 @@ class Rules
 
     // ------------------------------------------------------------------------
 
+    /**
+     * Rules::validate
+     *
+     * @return bool
+     * @throws \O2System\Spl\Exceptions\Logic\OutOfRangeException
+     */
     public function validate()
     {
         if (count($this->sourceVars) == 0) {
@@ -179,7 +188,7 @@ class Rules
             return false;
         }
 
-        foreach ($this->rules as $fieldName => $fieldParams) {
+        foreach ($this->clauses as $fieldName => $fieldParams) {
 
             /* Throw exception if existed rules field not yet exists in data source */
             if ( ! array_key_exists($fieldName, $this->sourceVars)) {
@@ -212,14 +221,14 @@ class Rules
                         /* Explode rule parameter */
                         $fieldRuleParams = explode(',', preg_replace("/,[ ]+/", ',', $fieldRuleParams[ 1 ][ 0 ]));
 
-                        if($fieldRuleMethod === 'match') {
-                            foreach($fieldRuleParams as $fieldRuleParamKey => $fieldRuleParamValue) {
-                                if(array_key_exists($fieldRuleParamValue, $this->sourceVars)) {
+                        if ($fieldRuleMethod === 'match') {
+                            foreach ($fieldRuleParams as $fieldRuleParamKey => $fieldRuleParamValue) {
+                                if (array_key_exists($fieldRuleParamValue, $this->sourceVars)) {
                                     $fieldRuleParams[ $fieldRuleParamKey ] = $this->sourceVars[ $fieldRuleParamValue ];
                                 }
                             }
-                        } elseif($fieldRuleMethod === 'listed') {
-                            $fieldRuleParams = [ $fieldRuleParams ];
+                        } elseif ($fieldRuleMethod === 'listed') {
+                            $fieldRuleParams = [$fieldRuleParams];
                         }
 
                         /* Merge method's param with field rule's params */
@@ -233,9 +242,9 @@ class Rules
                     /* Throw exception if method not exists in validation class */
                     if (method_exists($validationClass, $validationMethod)) {
                         $validationStatus = call_user_func_array([&$validationClass, $validationMethod], $fieldValue);
-                    } elseif(function_exists($fieldRuleMethod)) {
+                    } elseif (function_exists($fieldRuleMethod)) {
                         $validationStatus = call_user_func_array($fieldRuleMethod, $fieldValue);
-                    } elseif(is_callable($fieldRuleMethod)) {
+                    } elseif (is_callable($fieldRuleMethod)) {
                         $validationStatus = call_user_func_array($fieldRuleMethod, $fieldValue);
                     }
 
@@ -279,6 +288,13 @@ class Rules
 
     // --------------------------------------------------------------------------------------
 
+    /**
+     * Rules::setFieldError
+     *
+     * @param string $field
+     * @param string $label
+     * @param string $message
+     */
     protected function setFieldError($field, $label, $message)
     {
         $this->errors[ $field ] = [
@@ -289,14 +305,23 @@ class Rules
 
     // --------------------------------------------------------------------------------------
 
+    /**
+     * Rules::displayErrors
+     *
+     * @return array|string
+     */
     public function displayErrors()
     {
-        $ul = new Unordered();
+        if (class_exists('O2System\Framework', false)) {
+            $ul = new \O2System\Framework\Libraries\Ui\Contents\Lists\Unordered();
 
-        foreach ($this->getErrors() as $field => $errorParams) {
-            $ul->createList($errorParams[ 'label' ] . ': ' . $errorParams[ 'message' ]);
+            foreach ($this->getErrors() as $field => $errorParams) {
+                $ul->createList($errorParams[ 'label' ] . ': ' . $errorParams[ 'message' ]);
+            }
+
+            return $ul->render();
         }
 
-        return $ul->render();
+        return $this->getErrors();
     }
 }

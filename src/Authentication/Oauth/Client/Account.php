@@ -11,22 +11,30 @@
 
 // ------------------------------------------------------------------------
 
-namespace O2System\Security\Authentication\User;
+namespace O2System\Security\Authentication\Oauth\Client;
 
 // ------------------------------------------------------------------------
 
 use O2System\Psr\Patterns\Structural\Repository\AbstractRepository;
 
 /**
- * Class Role
- * @package O2System\Security\Authentication\User
+ * Class Account
+ * @package O2System\Security\Authentication\Oauth\Client
  */
-class Role extends AbstractRepository
+class Account extends AbstractRepository
 {
-    public function __construct(array $role)
+    /**
+     * Account::__construct
+     *
+     * @param array $account
+     */
+    public function __construct(array $account)
     {
-        foreach ($role as $key => $value) {
-            $this->store($key, $value);
+        foreach ($account as $key => $value) {
+            if (strpos($key, 'record') === false &&
+                ! in_array($key, ['password', 'pin', 'token', 'sso'])) {
+                $this->store($key, $value);
+            }
         }
     }
 }

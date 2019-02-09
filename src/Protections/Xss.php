@@ -1,6 +1,6 @@
 <?php
 /**
- * This file is part of the O2System PHP Framework package.
+ * This file is part of the O2System Framework package.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -92,7 +92,11 @@ class Xss
             ? $token
             : input()->postGet('xssToken');
 
-        return hash_equals($this->getToken(), $token);
+        if (is_string($token)) {
+            return hash_equals($this->getToken(), $token);
+        }
+
+        return false;
     }
 
     // ------------------------------------------------------------------------

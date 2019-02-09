@@ -1,6 +1,6 @@
 <?php
 /**
- * This file is part of the O2System PHP Framework package.
+ * This file is part of the O2System Framework package.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -20,21 +20,10 @@ namespace O2System\Security\Filters;
  */
 class Xss
 {
-    protected function getConfig($index)
-    {
-        static $config;
-
-        if (empty($config)) {
-            $config = require('../Config/Xss.php');
-        }
-
-        return $config[$index];
-    }
-
     /**
      * Clean
      *
-     * @param  string $string
+     * @param  string  $string
      * @param  boolean $isImage
      *
      * @return string
@@ -44,7 +33,7 @@ class Xss
         // Is the string an array?
         if (is_array($string)) {
             while (list($key) = each($string)) {
-                $string[$key] = self::clean($string[$key]);
+                $string[ $key ] = self::clean($string[ $key ]);
             }
 
             return $string;
@@ -268,8 +257,6 @@ class Xss
         return $string;
     }
 
-    // --------------------------------------------------------------------------------------
-
     /**
      * Do Never Allowed
      *
@@ -294,6 +281,19 @@ class Xss
         return $string;
     }
 
+    // --------------------------------------------------------------------------------------
+
+    protected function getConfig($index)
+    {
+        static $config;
+
+        if (empty($config)) {
+            $config = require('../Config/Xss.php');
+        }
+
+        return $config[ $index ];
+    }
+
     // --------------------------------------------------------------------
 
     /**
@@ -310,7 +310,7 @@ class Xss
      */
     protected static function compactExplodedWords($matches)
     {
-        return preg_replace('/\s+/s', '', $matches[1]) . $matches[2];
+        return preg_replace('/\s+/s', '', $matches[ 1 ]) . $matches[ 2 ];
     }
 
     // --------------------------------------------------------------------
@@ -329,13 +329,13 @@ class Xss
     protected static function sanitizeNaughtyHTML($matches)
     {
         // First, escape unclosed tags
-        if (empty($matches['closeTag'])) {
-            return '&lt;' . $matches[1];
+        if (empty($matches[ 'closeTag' ])) {
+            return '&lt;' . $matches[ 1 ];
         } // Is the element that we caught naughty? If so, escape it
-        elseif (in_array(strtolower($matches['tagName']), self::getConfig('naughty_tags'), true)) {
-            return '&lt;' . $matches[1] . '&gt;';
+        elseif (in_array(strtolower($matches[ 'tagName' ]), self::getConfig('naughty_tags'), true)) {
+            return '&lt;' . $matches[ 1 ] . '&gt;';
         } // For other tags, see if their attributes are "evil" and strip those
-        elseif (isset($matches['attributes'])) {
+        elseif (isset($matches[ 'attributes' ])) {
             // We'll store the already fitlered attributes here
             $attributes = [];
 
@@ -356,37 +356,37 @@ class Xss
                 // Strip any non-alpha characters that may preceed an attribute.
                 // Browsers often parse these incorrectly and that has been a
                 // of numerous XSS issues we've had.
-                $matches['attributes'] = preg_replace('#^[^a-z]+#i', '', $matches['attributes']);
+                $matches[ 'attributes' ] = preg_replace('#^[^a-z]+#i', '', $matches[ 'attributes' ]);
 
-                if (!preg_match($attributesPattern, $matches['attributes'], $attribute, PREG_OFFSET_CAPTURE)) {
+                if ( ! preg_match($attributesPattern, $matches[ 'attributes' ], $attribute, PREG_OFFSET_CAPTURE)) {
                     // No (valid) attribute found? Discard everything else inside the tag
                     break;
                 }
 
                 if (
                     // Is it indeed an "evil" attribute?
-                    preg_match($is_evil_pattern, $attribute['name'][0])
+                    preg_match($is_evil_pattern, $attribute[ 'name' ][ 0 ])
                     // Or does it have an equals sign, but no value and not quoted? Strip that too!
-                    OR (trim($attribute['value'][0]) === '')
+                    OR (trim($attribute[ 'value' ][ 0 ]) === '')
                 ) {
                     $attributes[] = 'xss=removed';
                 } else {
-                    $attributes[] = $attribute[0][0];
+                    $attributes[] = $attribute[ 0 ][ 0 ];
                 }
 
-                $matches['attributes'] = substr(
-                    $matches['attributes'],
-                    $attribute[0][1] + strlen($attribute[0][0])
+                $matches[ 'attributes' ] = substr(
+                    $matches[ 'attributes' ],
+                    $attribute[ 0 ][ 1 ] + strlen($attribute[ 0 ][ 0 ])
                 );
-            } while ($matches['attributes'] !== '');
+            } while ($matches[ 'attributes' ] !== '');
             $attributes = empty($attributes)
                 ? ''
                 : ' ' . implode(' ', $attributes);
 
-            return '<' . $matches['slash'] . $matches['tagName'] . $attributes . '>';
+            return '<' . $matches[ 'slash' ] . $matches[ 'tagName' ] . $attributes . '>';
         }
 
-        return $matches[0];
+        return $matches[ 0 ];
     }
 
     // --------------------------------------------------------------------
@@ -409,13 +409,13 @@ class Xss
     protected static function jsLinkRemoval($match)
     {
         return str_replace(
-            $match[1],
+            $match[ 1 ],
             preg_replace(
                 '#href=.*?(?:(?:alert|prompt|confirm)(?:\(|&\#40;)|javascript:|livescript:|mocha:|charset=|window\.|document\.|\.cookie|<script|<xss|data\s*:)#si',
                 '',
-                self::filterAttributes(str_replace(['<', '>'], '', $match[1]))
+                self::filterAttributes(str_replace(['<', '>'], '', $match[ 1 ]))
             ),
-            $match[0]
+            $match[ 0 ]
         );
     }
 
@@ -437,7 +437,7 @@ class Xss
     {
         $out = '';
         if (preg_match_all('#\s*[a-z\-]+\s*=\s*(\042|\047)([^\\1]*?)\\1#is', $str, $matches)) {
-            foreach ($matches[0] as $match) {
+            foreach ($matches[ 0 ] as $match) {
                 $out .= preg_replace('#/\*.*?\*/#s', '', $match);
             }
         }
@@ -465,13 +465,13 @@ class Xss
     protected static function jsImgRemoval($match)
     {
         return str_replace(
-            $match[1],
+            $match[ 1 ],
             preg_replace(
                 '#src=.*?(?:(?:alert|prompt|confirm)(?:\(|&\#40;)|javascript:|livescript:|mocha:|charset=|window\.|document\.|\.cookie|<script|<xss|base64\s*,)#si',
                 '',
-                self::filterAttributes(str_replace(['<', '>'], '', $match[1]))
+                self::filterAttributes(str_replace(['<', '>'], '', $match[ 1 ]))
             ),
-            $match[0]
+            $match[ 0 ]
         );
     }
 
@@ -488,7 +488,7 @@ class Xss
      */
     protected static function convertAttribute($match)
     {
-        return str_replace(['>', '<', '\\'], ['&gt;', '&lt;', '\\\\'], $match[0]);
+        return str_replace(['>', '<', '\\'], ['&gt;', '&lt;', '\\\\'], $match[ 0 ]);
     }
 
     // ------------------------------------------------------------------------
@@ -506,10 +506,10 @@ class Xss
     {
         // Protect GET variables in URLs
         // 901119URL5918AMP18930PROTECT8198
-        $match = preg_replace('|\&([a-z\_0-9\-]+)\=([a-z\_0-9\-/]+)|i', self::token . '\\1=\\2', $match[0]);
+        $match = preg_replace('|\&([a-z\_0-9\-]+)\=([a-z\_0-9\-/]+)|i', self::token . '\\1=\\2', $match[ 0 ]);
 
         $charset = 'UTF-8';
-        if(function_exists('config')) {
+        if (function_exists('config')) {
             $charset = config()->getItem('charset');
         }
 
@@ -536,7 +536,7 @@ class Xss
      *
      * @link    http://php.net/html-entity-decode
      *
-     * @param    string $string Input
+     * @param    string $string  Input
      * @param    string $charset Character set
      *
      * @return    string
@@ -551,7 +551,7 @@ class Xss
 
         isset($charset) || $charset = 'UTF-8';
 
-        if(function_exists('config')) {
+        if (function_exists('config')) {
             $charset = config()->getItem('charset');
         }
 
@@ -562,7 +562,7 @@ class Xss
 
             // Decode standard entities, avoiding false positives
             if ($c = preg_match_all('/&[a-z]{2,}(?![a-z;])/i', $string, $matches)) {
-                if (!isset($entities)) {
+                if ( ! isset($entities)) {
                     $entities = array_map(
                         'strtolower',
                         get_html_translation_table(HTML_ENTITIES, $flag)
@@ -570,10 +570,10 @@ class Xss
                 }
 
                 $replace = [];
-                $matches = array_unique(array_map('strtolower', $matches[0]));
+                $matches = array_unique(array_map('strtolower', $matches[ 0 ]));
                 for ($i = 0; $i < $c; $i++) {
-                    if (($char = array_search($matches[$i] . ';', $entities, true)) !== false) {
-                        $replace[$matches[$i]] = $char;
+                    if (($char = array_search($matches[ $i ] . ';', $entities, true)) !== false) {
+                        $replace[ $matches[ $i ] ] = $char;
                     }
                 }
 

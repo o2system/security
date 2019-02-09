@@ -1,6 +1,6 @@
 <?php
 /**
- * This file is part of the O2System PHP Framework package.
+ * This file is part of the O2System Framework package.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -11,23 +11,21 @@
 
 // ------------------------------------------------------------------------
 
-namespace O2System\Security\Authentication\Jwt;
+namespace O2System\Security\Authentication;
 
 // ------------------------------------------------------------------------
 
 use O2System\Security\Encoders\Base64;
 use O2System\Security\Encoders\Json;
-use O2System\Spl\Traits\Collectors\ErrorCollectorTrait;
+use O2System\Security\Generators\Signature;
+use O2System\Security\Generators\Token;
 
 /**
- * Class Token
- * @package O2System\Security\Authentication\Jwt
+ * Class JsonWebToken
+ * @package O2System\Security\Authentication
  */
-class Token
+class JsonWebToken extends Token
 {
-    use ErrorCollectorTrait;
-
-    protected $key = null;
     protected $keyId;
 
     /**
@@ -37,26 +35,9 @@ class Token
      */
     protected $leeway = 0;
 
-    /**
-     * Allow the current timestamp to be specified.
-     * Useful for fixing a value within unit testing.
-     *
-     * Will default to PHP time() value if null.
-     */
-    protected $timestamp;
-    protected $algorithm = 'HS256';
     protected $headers = [
         'typ' => 'JWT',
     ];
-
-    // ------------------------------------------------------------------------
-
-    public function setKey($key)
-    {
-        $this->key = $key;
-
-        return $this;
-    }
 
     // ------------------------------------------------------------------------
 
@@ -69,40 +50,11 @@ class Token
 
     // ------------------------------------------------------------------------
 
-    public function setAlgorithm($algorithm)
-    {
-        $algorithm = strtoupper($algorithm);
-
-        if (Signature::validAlgorithm($algorithm)) {
-            $this->algorithm = $algorithm;
-        }
-
-        return $this;
-    }
-
-    // ------------------------------------------------------------------------
-
     public function setLeeway($leeway)
     {
         $this->leeway = intval($leeway);
 
         return $this;
-    }
-
-    // ------------------------------------------------------------------------
-
-    public function setTimestamp($timestamp)
-    {
-        $this->timestamp = is_numeric($timestamp) ? $timestamp : strtotime($timestamp);
-
-        return $this;
-    }
-
-    // ------------------------------------------------------------------------
-
-    public function addHeader($key, $value)
-    {
-        $this->headers[ $key ] = $value;
     }
 
     // ------------------------------------------------------------------------
@@ -154,14 +106,16 @@ class Token
             list($headers, $payload, $signature) = $segments;
 
             // Base64 decode headers
-            if(false === ($headers = Base64::decode($headers))) {
+            if (false === ($headers = Base64::decode($headers))) {
                 $this->errors[] = 'Invalid header base64 decoding';
+
                 return false;
             }
 
             // Json decode headers
             if (null === ($headers = Json::decode($headers))) {
                 $this->errors[] = 'Invalid header json decoding';
+
                 return false;
             }
 
@@ -181,36 +135,42 @@ class Token
                 if (isset($headers->kid)) {
                     if ( ! isset($key[ $headers->kid ])) {
                         $this->errors[] = 'Invalid Key Id';
+
                         return false;
                     }
 
                     $key = $key[ $headers->kid ];
                 } else {
                     $this->errors[] = 'Empty Key id';
+
                     return false;
                 }
             }
 
             // Base64 decode payload
-            if(false === ($payload = Base64::decode($payload))) {
+            if (false === ($payload = Base64::decode($payload))) {
                 $this->errors[] = 'Invalid payload base64 decoding';
+
                 return false;
             }
 
             // Json decode payload
             if (null === ($payload = Json::decode($payload))) {
                 $this->errors[] = 'Invalid payload json decoding';
+
                 return false;
             }
 
             // Base64 decode payload
-            if(false === ($signature = Base64::decode($signature))) {
+            if (false === ($signature = Base64::decode($signature))) {
                 $this->errors[] = 'Invalid signature base64 decoding';
+
                 return false;
             }
 
-            if(Signature::verify($token, $signature, $key, $headers->alg) === false) {
+            if (Signature::verify($token, $signature, $key, $headers->alg) === false) {
                 $this->errors[] = 'Invalid signature';
+
                 return false;
             }
 
@@ -218,6 +178,7 @@ class Token
             // token can actually be used. If it's not yet that time, abort.
             if (isset($payload->nbf) && $payload->nbf > ($timestamp + $this->leeway)) {
                 $this->errors[] = 'Cannot handle token prior to ' . date(\DateTime::ISO8601, $payload->nbf);
+
                 return false;
             }
 
@@ -226,11 +187,13 @@ class Token
             // correctly used the nbf claim).
             if (isset($payload->iat) && $payload->iat > ($timestamp + $this->leeway)) {
                 $this->errors[] = 'Cannot handle token prior to ' . date(\DateTime::ISO8601, $payload->iat);
+
                 return false;
             }
             // Check if this token has expired.
             if (isset($payload->exp) && ($timestamp - $this->leeway) >= $payload->exp) {
                 $this->errors[] = 'Expired token';
+
                 return false;
             }
 

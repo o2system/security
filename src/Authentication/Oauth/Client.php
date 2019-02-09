@@ -11,23 +11,27 @@
 
 // ------------------------------------------------------------------------
 
-namespace O2System\Security\Generators;
+namespace O2System\Security\Authentication\Oauth;
 
 // ------------------------------------------------------------------------
 
+use O2System\Psr\Patterns\Structural\Repository\AbstractRepository;
+
 /**
- * Class Uid
- * @package O2System\Security\Generators
+ * Class Client
+ * @package O2System\Security\Authentication\Oauth\Resource\Request
  */
-class Uid
+class Client extends AbstractRepository
 {
-    public static function generate($length = 8)
+    /**
+     * Client::__construct
+     *
+     * @param array $account
+     */
+    public function __construct(array $account)
     {
-        $ids = str_split(time() . mt_rand());
-        shuffle($ids);
-
-        $ids = array_slice($ids, 0, $length);
-
-        return implode('', $ids);
+        foreach ($account as $offset => $value) {
+            $this->store($offset, $value);
+        }
     }
 }

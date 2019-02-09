@@ -1,5 +1,15 @@
 <?php
 /**
+ * This file is part of the O2System Framework package.
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ *
+ * @author         Steeve Andrian Salim
+ * @copyright      Copyright (c) Steeve Andrian Salim
+ */
+
+/**
  * Created by PhpStorm.
  * User: steevenz
  * Date: 02/07/18
@@ -30,7 +40,7 @@ class Authority extends AbstractRepository
             }
         } elseif ($offset === 'privileges') {
             list($create, $read, $update, $delete, $import, $export, $print, $special) = array_pad(str_split($data), 8,
-                                                                                                   0);
+                0);
             $data = [
                 'create'  => ($create == '1' ? true : false),
                 'read'    => ($read == '1' ? true : false),
@@ -59,6 +69,15 @@ class Authority extends AbstractRepository
     public function hasCreatePrivilege()
     {
         return $this->checkPrivilege('create');
+    }
+
+    public function checkPrivilege($action)
+    {
+        if ($privileges = $this->get('privileges')) {
+            return (bool)$privileges[ $action ];
+        }
+
+        return false;
     }
 
     public function hasReadPrivilege()
@@ -94,14 +113,5 @@ class Authority extends AbstractRepository
     public function hasSpecialPrivilege()
     {
         return $this->checkPrivilege('special');
-    }
-
-    public function checkPrivilege($action)
-    {
-        if ($privileges = $this->get('privileges')) {
-            return (bool) $privileges[ $action ];
-        }
-
-        return false;
     }
 }

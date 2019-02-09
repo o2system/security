@@ -1,6 +1,6 @@
 <?php
 /**
- * This file is part of the O2System PHP Framework package.
+ * This file is part of the O2System Framework package.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -86,7 +86,7 @@ class Http
         $this->setRealm($realm)
             ->setType($type);
 
-        if (class_exists('\O2System\Framework')) {
+        if (class_exists('\O2System\Framework', false) or class_exists('\O2System\Reactor', false)) {
             if ($security = config()->getItem('security')) {
                 if ($security->offsetExists('httpAuthentication')) {
                     $this->users = $security->offsetGet('httpAuthentication');

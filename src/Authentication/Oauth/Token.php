@@ -1,6 +1,6 @@
 <?php
 /**
- * This file is part of the O2System PHP Framework package.
+ * This file is part of the O2System Framework package.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -15,78 +15,25 @@ namespace O2System\Security\Authentication\Oauth;
 
 // ------------------------------------------------------------------------
 
+use O2System\Psr\Http\Server\MethodInterface;
+use O2System\Security\Encoders\Base64;
+use O2System\Security\Encoders\Json;
+use O2System\Security\Generators\Signature;
+use O2System\Spl\Traits\Collectors\ErrorCollectorTrait;
+
 /**
  * Class Token
  * @package O2System\Security\Authentication\Oauth
  */
-class Token
+class Token implements MethodInterface
 {
-    /**
-     * Token::$key
-     *
-     * String of OAuth Token (oauth_token).
-     *
-     * @var string
-     */
-    protected $key;
+    use ErrorCollectorTrait;
 
-    /**
-     * Token::$secret
-     *
-     * String of OAuth Token Secret (oauth_token_secret).
-     *
-     * @var string
-     */
-    protected $secret;
+    protected $consumer;
 
-    // ------------------------------------------------------------------------
-
-    /**
-     * Token::__construct
-     *
-     * @param string $key    oauth_token.
-     * @param string $secret oauth_token_secret.
-     */
-    public function __construct($key, $secret)
+    public function __construct(Consumer $consumer)
     {
-        $this->setKey($key);
-        $this->setSecret($secret);
-    }
-
-    // ------------------------------------------------------------------------
-
-    /**
-     * Token::setKey
-     *
-     * Sets oauth_token.
-     *
-     * @param string $key oauth_token.
-     *
-     * @return static
-     */
-    public function setKey($key)
-    {
-        $this->key = $key;
-
-        return $this;
-    }
-
-    // ------------------------------------------------------------------------
-
-    /**
-     * Token::setSecret
-     *
-     * Sets oauth_token_secret.
-     *
-     * @param string $secret oauth_token_secret.
-     *
-     * @return static
-     */
-    public function setSecret($secret)
-    {
-        $this->secret = $secret;
-
-        return $this;
+        $this->consumer = $consumer;
     }
 
     // ------------------------------------------------------------------------
@@ -109,4 +56,58 @@ class Token
 
         return false;
     }
+
+    // ------------------------------------------------------------------------
+
+    /**
+     * Token::getRequest
+     *
+     * Gets OAuth Request Token.
+     *
+     * @return array|bool Returns FALSE if failed.
+     */
+    public function getRequest($callbackUrl, $httpMethod = self::HTTP_POST)
+    {
+        $algorithm = 'HMAC-SHA1';
+        if (false === ($signature = Base64::decode($this->consumer->secret))) {
+            $this->addError(400, 'Invalid Consumer Secret');
+
+            return false;
+        }
+
+        if (false === ($signature = Json::decode($signature))) {
+            $this->addError(400, 'Invalid Consumer Secret');
+
+            return false;
+        }
+
+        $signature->callbackUrl = $callbackUrl;
+        $signature->httpMethod = $httpMethod;
+        $algorithm = $signature->algorithm;
+
+        if (false !== ($payload = Base64::decode($this->consumer->key))) {
+            $payload = Json::decode($payload)->getArrayCopy();
+        }
+
+        if ($payload) {
+            $payload[ 'timestamp' ] = time();
+
+            $segments[] = Base64::encode(Json::encode($signature));
+            $segments[] = $token = Base64::encode(Signature::generate([
+                'payload' => Base64::encode(Json::encode($payload)),
+                'token'   => \OAuthProvider::generateToken(strlen($this->consumer->secret), true),
+            ], $this->consumer->key, $algorithm));
+
+            $secret = Base64::encode(Signature::generate($segments, $this->consumer->key, $algorithm));
+
+            return [
+                'oauth_token'        => $token,
+                'oauth_token_secret' => $secret,
+            ];
+        }
+
+        return false;
+    }
+
+    // ------------------------------------------------------------------------
 }

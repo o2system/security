@@ -1,6 +1,6 @@
 <?php
 /**
- * This file is part of the O2System PHP Framework package.
+ * This file is part of the O2System Framework package.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -38,9 +38,9 @@ class WebToken
             ? $token
             : input()->server('HTTP_X_WEB_TOKEN');
 
-        if(is_null($token)) {
+        if (is_null($token)) {
             return false;
-        } elseif(is_callable($callback)) {
+        } elseif (is_callable($callback)) {
             return call_user_func($callback, $token);
         }
 

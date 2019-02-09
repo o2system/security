@@ -1,6 +1,6 @@
 <?php
 /**
- * This file is part of the O2System PHP Framework package.
+ * This file is part of the O2System Framework package.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -15,12 +15,22 @@ namespace O2System\Security\Authentication\Oauth;
 
 // ------------------------------------------------------------------------
 
+use O2System\Psr\Http\Server\MethodInterface;
+use O2System\Security\Encoders\Base64;
+use O2System\Security\Encoders\Json;
+use O2System\Security\Generators;
+use O2System\Spl\Traits\Collectors\ErrorCollectorTrait;
+
 /**
  * Class Consumer
  * @package O2System\Security\Authentication\Oauth
  */
-class Consumer
+class Consumer implements MethodInterface
 {
+    use ErrorCollectorTrait;
+
+    public $version = '1.0';
+
     /**
      * Consumer::$key
      *
@@ -28,7 +38,7 @@ class Consumer
      *
      * @var string
      */
-    protected $key;
+    public $key;
 
     /**
      * Consumer::$secret
@@ -37,18 +47,7 @@ class Consumer
      *
      * @var string
      */
-    protected $secret;
-
-    /**
-     * Consumer::$callbackUrl
-     *
-     * OAuth Callback Url (oauth_callback).
-     *
-     * @var string
-     */
-    protected $callbackUrl;
-
-    // ------------------------------------------------------------------------
+    public $secret;
 
     /**
      * Consumer::__construct
@@ -101,19 +100,66 @@ class Consumer
     // ------------------------------------------------------------------------
 
     /**
-     * Consumer::setCallbackUrl
+     * Consumer::generate
      *
-     * Sets oauth_callback
+     * Generate consumer secret and key base on payload.
      *
-     * @param string $callbackUrl oauth_callback.
+     * @param array $payload
+     *
+     * @return array
+     */
+    public static function generate(array $payload, $algorithm = 'HMAC-SHA1')
+    {
+        $token = new Generators\Token();
+        $token->setAlgorithm($algorithm);
+        $token->addHeader('timestamp', time());
+
+        $tokenString = $token->encode($payload);
+        $tokenParts = explode('.', $tokenString);
+        $tokenParts = array_map('trim', $tokenParts);
+
+        return [
+            'oauth_consumer_key'    => $tokenParts[ 1 ],
+            'oauth_consumer_secret' => $tokenParts[ 0 ],
+        ];
+    }
+
+    // ------------------------------------------------------------------------
+
+    /**
+     * Consumer::setVersion
+     *
+     * Sets oauth_version to 1.0 or 2.0
+     *
+     * @param string $version
      *
      * @return static
      */
-    public function setCallbackUrl($callbackUrl)
+    public function setVersion($version)
     {
-        $this->callbackUrl = $callbackUrl;
+        $this->version = in_array($version, ['1.0', '2.0']) ? $version : '1.0';
 
         return $this;
+    }
+
+    // ------------------------------------------------------------------------
+
+    /**
+     * Consumer::getRequestToken
+     *
+     * Fetch a request token, secret and any additional response parameters from the service provider.
+     *
+     * @param \O2System\Security\Authentication\Oauth\Consumer $consumer
+     * @param string                                           $callbackUrl
+     * @param string                                           $httpMethod
+     *
+     * @return array|bool Returns FALSE if failed.
+     */
+    public function getRequestToken($callbackUrl, $httpMethod = self::HTTP_POST)
+    {
+        $token = new Token($this);
+
+        return $token->getRequest($callbackUrl, $httpMethod);
     }
 
     // ------------------------------------------------------------------------
@@ -123,34 +169,40 @@ class Consumer
      *
      * Gets OAuth HTTP_AUTHORIZATION header parameters.
      *
-     * @param string|null $httpUrl
+     * @param string|null $callbackUrl
      * @param string      $httpMethod
      *
-     * @return string
+     * @return string|bool Returns FALSE if failed
      */
-    public function getAuthorizationHeader($httpUrl = null, $httpMethod = 'GET')
+    public function getAuthorizationHeader($callbackUrl, $httpMethod = self::HTTP_GET)
     {
-        $signatureMethod = OAUTH_SIG_METHOD_HMACSHA1;
+        $algorithm = 'HMAC-SHA1';
+        if (false === ($signature = Base64::decode($this->secret))) {
+            $this->addError(400, 'Invalid Consumer Secret');
+
+            return false;
+        }
+
+        if (false === ($signature = Json::decode($signature))) {
+            $this->addError(400, 'Invalid Consumer Secret');
+
+            return false;
+        }
+
+        $algorithm = $signature->algorithm;
+
+        $oauth = new \OAuth($this->key, $this->secret, $algorithm, OAUTH_AUTH_TYPE_AUTHORIZATION);
 
         $parameters = [
-            'oauth_nonce'            => Nonce::generate($signatureMethod),
-            'oauth_signature_method' => $signatureMethod,
+            'oauth_nonce'            => Generators\Nonce::generate($algorithm),
+            'oauth_callback'         => $callbackUrl,
+            'oauth_signature_method' => $algorithm,
             'oauth_timestamp'        => time(),
             'oauth_consumer_key'     => $this->key,
-            'oauth_version'          => '1.0',
         ];
 
-        if (isset($httpUrl)) {
-            $parameters[ 'oauth_signature' ] = $this->getSignature($signatureMethod, $httpUrl, $httpMethod,
-                $parameters);
-        } else {
-            $parameters[ 'oauth_signature' ] = $this->getSignature($signatureMethod, null, null,
-                $parameters);
-        }
-
-        if ( ! empty($this->callbackUrl)) {
-            $parameters[ 'callback' ] = $this->callbackUrl;
-        }
+        $parameters[ 'oauth_signature' ] = $oauth->generateSignature($httpMethod, $callbackUrl, $parameters);
+        $parameters[ 'oauth_version' ] = $this->version;
 
         $parts = [];
         foreach ($parameters as $key => $value) {
@@ -158,61 +210,6 @@ class Consumer
         }
 
         return 'OAuth ' . implode(', ', $parts);
-    }
-
-    // ------------------------------------------------------------------------
-
-    /**
-     * Consumer::getSignature
-     *
-     * Gets OAuth Consumer Signature.
-     *
-     * @param string      $signatureMethod
-     * @param string|null $httpUrl
-     * @param string|null $httpMethod
-     * @param array       $parameters
-     *
-     * @return string
-     */
-    public function getSignature(
-        $signatureMethod = OAUTH_SIG_METHOD_HMACSHA1,
-        $httpUrl = null,
-        $httpMethod = OAUTH_HTTP_METHOD_GET,
-        array $parameters = []
-    ) {
-        if (isset($httpUrl)) {
-            $urlParts = parse_url($httpUrl);
-            $scheme = $urlParts[ 'scheme' ];
-            $host = strtolower($urlParts[ 'host' ]);
-            $path = $urlParts[ 'path' ];
-            $httpUrl = "$scheme://$host$path";
-
-            $parts = [
-                rawurlencode(strtoupper($httpMethod)),
-                rawurlencode($httpUrl),
-                rawurlencode(http_build_query($parameters, null, null, PHP_QUERY_RFC3986)),
-            ];
-        } else {
-            $parts = [
-                rawurlencode(http_build_query($parameters, null, null, PHP_QUERY_RFC3986)),
-            ];
-        }
-
-        $signatureBaseString = implode('&', $parts);
-
-        switch ($signatureMethod) {
-            default:
-            case OAUTH_SIG_METHOD_HMACSHA1:
-            case OAUTH_SIG_METHOD_RSASHA1:
-
-                return hash_hmac('sha1', $signatureBaseString, $this->secret);
-                break;
-
-            case OAUTH_SIG_METHOD_HMACSHA256:
-
-                return hash_hmac('sha256', $signatureBaseString, $this->secret);
-                break;
-        }
     }
 
     // ------------------------------------------------------------------------

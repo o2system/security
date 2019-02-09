@@ -1,6 +1,6 @@
 <?php
 /**
- * This file is part of the O2System PHP Framework package.
+ * This file is part of the O2System Framework package.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -35,8 +35,17 @@ class Authorities extends AbstractProvider implements ValidationInterface
      */
     public function validate($object)
     {
-        if($object instanceof Authority) {
+        if ($object instanceof Authority) {
             return true;
+        }
+
+        return false;
+    }
+
+    public function authorize($segments)
+    {
+        if ($authority = $this->getAuthority($segments)) {
+            return $authority->getPermission() === 'GRANTED' ? true : false;
         }
 
         return false;
@@ -46,19 +55,10 @@ class Authorities extends AbstractProvider implements ValidationInterface
     {
         $segments = is_array($segments) ? implode('/', $segments) : $segments;
 
-        if($this->exists($segments)) {
-            if(($authority = $this->getObject($segments)) instanceof Authority) {
+        if ($this->exists($segments)) {
+            if (($authority = $this->getObject($segments)) instanceof Authority) {
                 return $authority;
             }
-        }
-
-        return false;
-    }
-
-    public function authorize($segments)
-    {
-        if($authority = $this->getAuthority($segments)) {
-            return $authority->getPermission() === 'GRANTED' ? true : false;
         }
 
         return false;
