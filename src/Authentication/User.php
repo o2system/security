@@ -27,6 +27,11 @@ class User
 {
     use ConfigCollectorTrait;
 
+    // ------------------------------------------------------------------------
+
+    /**
+     * User::__construct
+     */
     public function __construct()
     {
         $this->setConfig([
@@ -43,6 +48,15 @@ class User
         ]);
     }
 
+    // ------------------------------------------------------------------------
+
+    /**
+     * User::setPasswordAlgorithm
+     *
+     * @param $algorithm
+     *
+     * @return static
+     */
     public function setPasswordAlgorithm($algorithm)
     {
         if (in_array($algorithm, [PASSWORD_DEFAULT, PASSWORD_BCRYPT, PASSWORD_ARGON2I])) {
@@ -52,6 +66,15 @@ class User
         return $this;
     }
 
+    // ------------------------------------------------------------------------
+
+    /**
+     * User::setPasswordOptions
+     *
+     * @param array $options
+     *
+     * @return static
+     */
     public function setPasswordOptions(array $options)
     {
         $this->options = $options;
@@ -59,6 +82,15 @@ class User
         return $this;
     }
 
+    // ------------------------------------------------------------------------
+
+    /**
+     * User::passwordRehash
+     *
+     * @param string $password
+     *
+     * @return bool|string
+     */
     public function passwordRehash($password)
     {
         if (password_needs_rehash(
@@ -72,6 +104,15 @@ class User
         return $password;
     }
 
+    // ------------------------------------------------------------------------
+
+    /**
+     * User::passwordHash
+     *
+     * @param string $password
+     *
+     * @return bool|string
+     */
     public function passwordHash($password)
     {
         return password_hash(
@@ -81,16 +122,38 @@ class User
         );
     }
 
+    // ------------------------------------------------------------------------
+
+    /**
+     * User::passwordVerify
+     *
+     * @param string $password
+     * @param string $hash
+     *
+     * @return bool
+     */
     public function passwordVerify($password, $hash)
     {
         return password_verify($password, $hash);
     }
 
+    // ------------------------------------------------------------------------
+
+    /**
+     * User::attempt
+     */
     public function attempt()
     {
         $_SESSION[ 'userAttempts' ] = $this->getAttempts() + 1;
     }
 
+    // ------------------------------------------------------------------------
+
+    /**
+     * User::getAttempt
+     *
+     * @return int
+     */
     public function getAttempts()
     {
         $currentAttempts = 0;
@@ -101,12 +164,28 @@ class User
         return (int)$currentAttempts;
     }
 
+    // ------------------------------------------------------------------------
+
+    /**
+     * User::login
+     *
+     * @param array $account
+     */
     public function login(array $account)
     {
         $_SESSION[ 'account' ] = $account;
         unset($_SESSION[ 'userAttempts' ]);
     }
 
+    // ------------------------------------------------------------------------
+
+    /**
+     * User::signOn
+     *
+     * @param array $account
+     *
+     * @throws \Exception
+     */
     public function signOn(array $account)
     {
         $cacheItemPool = $this->getCacheItemPool();
@@ -116,7 +195,11 @@ class User
         set_cookie('ssid', $virtualUserId);
     }
 
+    // ------------------------------------------------------------------------
+
     /**
+     * User::getCacheItemPool
+     *
      * @return CacheItemPoolInterface
      */
     protected function getCacheItemPool()
@@ -130,6 +213,14 @@ class User
         return $cacheItemPool;
     }
 
+    // ------------------------------------------------------------------------
+
+    /**
+     * User::loggedIn
+     *
+     * @return bool
+     * @throws \O2System\Psr\Cache\InvalidArgumentException
+     */
     public function loggedIn()
     {
         if (isset($_SESSION[ 'account' ])) {
@@ -145,6 +236,14 @@ class User
         return false;
     }
 
+    // ------------------------------------------------------------------------
+
+    /**
+     * User::signedOn
+     *
+     * @return bool
+     * @throws \O2System\Psr\Cache\InvalidArgumentException
+     */
     public function signedOn()
     {
         if ($virtualUserId = input()->cookie('ssid')) {
@@ -156,12 +255,24 @@ class User
         return false;
     }
 
+    // ------------------------------------------------------------------------
+
+    /**
+     * User::logout
+     */
     public function logout()
     {
         $this->signOff();
         unset($_SESSION[ 'account' ]);
     }
 
+    // ------------------------------------------------------------------------
+
+    /**
+     * User::signOff
+     *
+     * @throws \O2System\Psr\Cache\InvalidArgumentException
+     */
     public function signOff()
     {
         if ($virtualUserId = input()->cookie('ssid')) {
