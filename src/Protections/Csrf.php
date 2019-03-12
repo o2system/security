@@ -90,7 +90,7 @@ class Csrf
     {
         $token = isset($token)
             ? $token
-            : input()->postGet('csrfToken');
+            : input()->postGet('csrf-token');
 
         if (is_string($token)) {
             return hash_equals($this->getToken(), $token);
