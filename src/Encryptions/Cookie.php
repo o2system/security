@@ -1,6 +1,6 @@
 <?php
 /**
- * This file is part of the O2System PHP Framework package.
+ * This file is part of the O2System Framework package.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -57,7 +57,7 @@ class Cookie
             'httpOnly' => false,
         ];
 
-        if (class_exists('\O2System\Framework', false)) {
+        if (class_exists('\O2System\Framework', false) or class_exists('\O2System\Reactor', false)) {
             $this->options = config()->getItem('cookie')->getArrayCopy();
             $this->options[ 'expire' ] = time() + $this->options[ 'lifetime' ];
             unset($this->options[ 'lifetime' ]);
@@ -121,7 +121,7 @@ class Cookie
             $value,
             $this->options[ 'expire' ],
             $this->options[ 'path' ],
-            $this->options[ 'domain' ],
+            '.' . ltrim($this->options[ 'domain' ], '.'),
             false,
             false
         );

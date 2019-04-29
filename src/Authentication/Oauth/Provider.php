@@ -1,6 +1,6 @@
 <?php
 /**
- * This file is part of the O2System PHP Framework package.
+ * This file is part of the O2System Framework package.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -11,17 +11,17 @@
 
 // ------------------------------------------------------------------------
 
-namespace O2System\Security\Protections\Oauth;
+namespace O2System\Security\Authentication\Oauth;
 
 // ------------------------------------------------------------------------
 
-use O2System\Security\Protections\Oauth\Datastructures;
-use O2System\Security\Protections\Oauth\Interfaces\ProviderModelInterface;
+use O2System\Security\Authentication\Oauth\DataStructures;
+use O2System\Security\Authentication\Oauth\Interfaces\ProviderModelInterface;
 use O2System\Spl\Traits\Collectors\ErrorCollectorTrait;
 
 /**
  * Class Provider
- * @package O2System\Security\Protections\Oauth
+ * @package O2System\Security\Authentication\Oauth
  */
 class Provider
 {
@@ -37,21 +37,21 @@ class Provider
     /**
      * Provider::$consumer
      *
-     * @var \O2System\Security\Protections\Oauth\Datastructures\Consumer
+     * @var \O2System\Security\Authentication\Oauth\DataStructures\Consumer
      */
     protected $consumer;
 
     /**
      * Provider::$token
      *
-     * @var \O2System\Security\Protections\Oauth\Datastructures\Token
+     * @var \O2System\Security\Authentication\Oauth\DataStructures\Token
      */
     protected $token;
 
     /**
      * Provider::$model
      *
-     * @var \O2System\Security\Protections\Oauth\Interfaces\ProviderModelInterface
+     * @var \O2System\Security\Authentication\Oauth\Interfaces\ProviderModelInterface
      */
     protected $model;
 
@@ -63,7 +63,8 @@ class Provider
     public function __construct()
     {
         language()
-            ->addFilePath(str_replace('Protections' . DIRECTORY_SEPARATOR . 'Oauth', '', __DIR__) . DIRECTORY_SEPARATOR)
+            ->addFilePath(str_replace('Authentication' . DIRECTORY_SEPARATOR . 'Oauth', '',
+                    __DIR__) . DIRECTORY_SEPARATOR)
             ->loadFile('oauth');
 
         $this->oauth = new \OAuthProvider([
@@ -187,7 +188,7 @@ class Provider
      *
      * Gets OAuth Access Token.
      *
-     * @return array|bool|\O2System\Security\Protections\Oauth\Datastructures\Token
+     * @return array|bool|\O2System\Security\Authentication\Oauth\DataStructures\Token
      */
     public function getAccessToken()
     {
@@ -198,7 +199,7 @@ class Provider
                 'timestamp'         => $token[ 'timestamp' ] = date('Y-m-d H:m:s'),
                 'expires'           => $token[ 'expires' ] = time() + 3600,
             ])) {
-                return new Datastructures\Token([
+                return new DataStructures\Token([
                     'key'       => $this->token->key,
                     'secret'    => $this->token->secret,
                     'nonce'     => $token[ 'nonce' ],
@@ -210,7 +211,7 @@ class Provider
         }
 
         $token = $this->generateToken('ACCESS');
-        $token = new Datastructures\Token([
+        $token = new DataStructures\Token([
             'id'       => $token[ 'id' ],
             'key'      => $token[ 'key' ],
             'secret'   => $token[ 'secret' ],
@@ -243,62 +244,55 @@ class Provider
     protected function generateToken($type = 'ACCESS', $length = 32, $strong = true)
     {
         if ( ! empty($this->consumer->secret)) {
-            if (false !== ($token = $this->model->findToken([
-                    'id_consumer' => $this->consumer->id,
-                    'type'        => $type,
-                ]))) {
-                $this->oauth->nonce = $token->nonce;
+            return [
+                'oauth_token'        => hash_hmac('sha1', \OAuthProvider::generateToken($length, $strong),
+                    $this->consumer->secret),
+                'oauth_token_secret' => hash_hmac('sha1', \OAuthProvider::generateToken($length, $strong),
+                    $this->consumer->secret),
+            ];
+            switch ($this->oauth->signature_method) {
+                default:
+                case OAUTH_SIG_METHOD_HMACSHA1:
+                case OAUTH_SIG_METHOD_RSASHA1:
 
-                return [
-                    'id'     => $token->id,
-                    'key'    => $token->key,
-                    'secret' => $token->secret,
-                ];
-            } else {
-                switch ($this->oauth->signature_method) {
-                    default:
-                    case OAUTH_SIG_METHOD_HMACSHA1:
-                    case OAUTH_SIG_METHOD_RSASHA1:
+                    $token = [
+                        'key'    => hash_hmac('sha1', \OAuthProvider::generateToken($length, $strong),
+                            $this->consumer->secret),
+                        'secret' => hash_hmac('sha1', \OAuthProvider::generateToken($length, $strong),
+                            $this->consumer->secret),
+                    ];
+                    break;
 
-                        $token = [
-                            'key'    => hash_hmac('sha1', \OAuthProvider::generateToken($length, $strong),
-                                $this->consumer->secret),
-                            'secret' => hash_hmac('sha1', \OAuthProvider::generateToken($length, $strong),
-                                $this->consumer->secret),
-                        ];
-                        break;
+                case OAUTH_SIG_METHOD_HMACSHA256:
 
-                    case OAUTH_SIG_METHOD_HMACSHA256:
+                    $token = [
+                        'key'    => hash_hmac('sha256', \OAuthProvider::generateToken($length, $strong),
+                            $this->consumer->secret),
+                        'secret' => hash_hmac('sha256', \OAuthProvider::generateToken($length, $strong),
+                            $this->consumer->secret),
+                    ];
+                    break;
+            }
 
-                        $token = [
-                            'key'    => hash_hmac('sha256', \OAuthProvider::generateToken($length, $strong),
-                                $this->consumer->secret),
-                            'secret' => hash_hmac('sha256', \OAuthProvider::generateToken($length, $strong),
-                                $this->consumer->secret),
-                        ];
-                        break;
-                }
+            $nonce = (empty($this->oauth->nonce) ? Oauth::generateNonce() : $this->oauth->nonce);
+            $callback = (empty($this->oauth->callback) ? null : $this->oauth->callback);
 
-                $nonce = (empty($this->oauth->nonce) ? Oauth::generateNonce() : $this->oauth->nonce);
-                $callback = (empty($this->oauth->callback) ? null : $this->oauth->callback);
+            if ($this->model->insertToken([
+                'id_consumer' => $this->consumer->id,
+                'key'         => $token[ 'key' ],
+                'secret'      => $token[ 'secret' ],
+                'type'        => $type,
+                'callback'    => $callback,
+            ])) {
+                $token[ 'id' ] = $this->model->db->getLastInsertId();
 
-                if ($this->model->insertToken([
-                    'id_consumer' => $this->consumer->id,
-                    'key'         => $token[ 'key' ],
-                    'secret'      => $token[ 'secret' ],
-                    'type'        => $type,
-                    'callback'    => $callback,
+                if ($this->model->insertTokenNonce([
+                    'id_consumer_token' => $token[ 'id' ],
+                    'nonce'             => $nonce,
+                    'timestamp'         => date('Y-m-d H:m:s'),
+                    'expires'           => time() + 3600,
                 ])) {
-                    $token[ 'id' ] = $this->model->db->getLastInsertId();
-
-                    if ($this->model->insertTokenNonce([
-                        'id_consumer_token' => $token[ 'id' ],
-                        'nonce'             => $nonce,
-                        'timestamp'         => date('Y-m-d H:m:s'),
-                        'expires'           => time() + 3600,
-                    ])) {
-                        return $token;
-                    }
+                    return $token;
                 }
             }
         }
@@ -333,7 +327,7 @@ class Provider
      */
     public function handleConsumer($provider)
     {
-        $this->consumer = new Datastructures\Consumer();
+        $this->consumer = new DataStructures\Consumer();
 
         if (false !== ($consumer = $this->model->findConsumer(['key' => $provider->consumer_key]))) {
             $this->consumer->id = $consumer->id;

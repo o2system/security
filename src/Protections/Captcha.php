@@ -1,6 +1,6 @@
 <?php
 /**
- * This file is part of the O2System PHP Framework package.
+ * This file is part of the O2System Framework package.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -106,7 +106,7 @@ class Captcha
      */
     public function getImage()
     {
-        if (class_exists('O2System\Framework')) {
+        if (class_exists('O2System\Framework') or class_exists('\O2System\Reactor', false)) {
             $tempFilePath = @tempnam(PATH_CACHE, 'captcha');
         } else {
             $tempFilePath = @tempnam(
@@ -165,8 +165,8 @@ class Captcha
             ? $token
             : input()->postGet('captchaToken');
 
-        if (false !== ($this->getToken() === $token)) {
-            return true;
+        if (is_string($token)) {
+            return hash_equals($this->getToken(), $token);
         }
 
         return false;

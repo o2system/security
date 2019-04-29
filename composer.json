@@ -34,8 +34,10 @@
     "github-wiki": "http://github.com/o2system/psr/wiki"
   },
   "require": {
-    "php": ">=5.6.0",
-    "o2system/session":"*"
+    "php": "^7.2.0",
+    "ext-openssl": "*",
+    "ext-mcrypt": "*",
+    "o2system/session": "*"
   },
   "autoload": {
     "psr-4": {

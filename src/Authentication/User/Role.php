@@ -11,23 +11,22 @@
 
 // ------------------------------------------------------------------------
 
-namespace O2System\Security\Generators;
+namespace O2System\Security\Authentication\User;
 
 // ------------------------------------------------------------------------
 
+use O2System\Spl\Patterns\Structural\Repository\AbstractRepository;
+
 /**
- * Class Uid
- * @package O2System\Security\Generators
+ * Class Role
+ * @package O2System\Security\Authentication\User
  */
-class Uid
+class Role extends AbstractRepository
 {
-    public static function generate($length = 8)
+    public function __construct(array $role)
     {
-        $ids = str_split(time() . mt_rand());
-        shuffle($ids);
-
-        $ids = array_slice($ids, 0, $length);
-
-        return implode('', $ids);
+        foreach ($role as $key => $value) {
+            $this->store($key, $value);
+        }
     }
 }

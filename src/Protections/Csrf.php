@@ -1,6 +1,6 @@
 <?php
 /**
- * This file is part of the O2System PHP Framework package.
+ * This file is part of the O2System Framework package.
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -72,7 +72,7 @@ class Csrf
      */
     public function regenerate()
     {
-        $_SESSION[ 'csrfToken' ] = $this->token = md5(uniqid(mt_rand(), true) . 'CSRF');
+        $_SESSION[ 'csrfToken' ] = $this->token = 'CSRF-' . bin2hex(random_bytes(32));
     }
 
     // ------------------------------------------------------------------------
@@ -90,10 +90,10 @@ class Csrf
     {
         $token = isset($token)
             ? $token
-            : input()->postGet('csrfToken');
+            : input()->postGet('csrf-token');
 
-        if (false !== ($this->getToken() === $token)) {
-            return true;
+        if (is_string($token)) {
+            return hash_equals($this->getToken(), $token);
         }
 
         return false;
