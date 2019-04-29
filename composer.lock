@@ -1,0 +1,290 @@
+{
+    "_readme": [
+        "This file locks the dependencies of your project to a known state",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "This file is @generated automatically"
+    ],
+    "content-hash": "f89633fb7f586530f1bbcb456aed61a4",
+    "packages": [
+        {
+            "name": "o2system/gear",
+            "version": "v2.1.32",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/o2system/gear.git",
+                "reference": "1c6b845df2e99c26039c1eb20863f3435483bea5"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/o2system/gear/zipball/1c6b845df2e99c26039c1eb20863f3435483bea5",
+                "reference": "1c6b845df2e99c26039c1eb20863f3435483bea5",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.6.0"
+            },
+            "type": "package",
+            "autoload": {
+                "psr-4": {
+                    "O2System\\Gear\\": "src"
+                },
+                "files": [
+                    "src/Helper.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Steeven Andrian Salim",
+                    "email": "steevenz@steevenz.com",
+                    "homepage": "http://www.steevenz.com",
+                    "role": "Founder and Lead Project"
+                },
+                {
+                    "name": "Teguh Rianto",
+                    "email": "teguh.rianto22@gmail.com",
+                    "homepage": "http://teguhrianto22.pusku.com",
+                    "role": "Template Designer"
+                }
+            ],
+            "description": "PHP Developer Tools Library",
+            "keywords": [
+                "driver",
+                "framework",
+                "libraries",
+                "php",
+                "utilities"
+            ],
+            "time": "2019-01-10T16:41:51+00:00"
+        },
+        {
+            "name": "o2system/kernel",
+            "version": "v1.9.134",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/o2system/kernel.git",
+                "reference": "da4c7436e2bc50aa8da20dd7914ffa89cf3cdda2"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/o2system/kernel/zipball/da4c7436e2bc50aa8da20dd7914ffa89cf3cdda2",
+                "reference": "da4c7436e2bc50aa8da20dd7914ffa89cf3cdda2",
+                "shasum": ""
+            },
+            "require": {
+                "o2system/gear": "*",
+                "o2system/psr": "*",
+                "o2system/spl": "*",
+                "php": ">=5.6.0"
+            },
+            "type": "package",
+            "autoload": {
+                "psr-4": {
+                    "O2System\\Kernel\\": "src"
+                },
+                "files": [
+                    "src/Config/Constants.php",
+                    "src/Helpers/Common.php",
+                    "src/Helpers/Inflector.php",
+                    "src/Helpers/Cookie.php",
+                    "src/Kernel.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Steeven Andrian Salim",
+                    "email": "steevenz@steevenz.com",
+                    "homepage": "http://www.steevenz.com",
+                    "role": "Founder and Lead Project"
+                },
+                {
+                    "name": "Teguh Rianto",
+                    "email": "teguh.rianto22@gmail.com",
+                    "homepage": "http://teguhrianto22.pusku.com",
+                    "role": "Template Designer"
+                }
+            ],
+            "description": "O2System Framework Kernel",
+            "keywords": [
+                "driver",
+                "framework",
+                "libraries",
+                "php",
+                "singleton"
+            ],
+            "time": "2019-01-11T11:54:28+00:00"
+        },
+        {
+            "name": "o2system/psr",
+            "version": "v1.2.101",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/o2system/psr.git",
+                "reference": "5629ca9b9508a29871e6c2be51d46c8ec2a7cc57"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/o2system/psr/zipball/5629ca9b9508a29871e6c2be51d46c8ec2a7cc57",
+                "reference": "5629ca9b9508a29871e6c2be51d46c8ec2a7cc57",
+                "shasum": ""
+            },
+            "require": {
+                "o2system/spl": "*",
+                "php": ">=5.6.0"
+            },
+            "type": "package",
+            "autoload": {
+                "psr-4": {
+                    "O2System\\Psr\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Steeven Andrian Salim",
+                    "email": "steevenz@steevenz.com",
+                    "homepage": "http://www.steevenz.com",
+                    "role": "Founder and Lead Project"
+                },
+                {
+                    "name": "Teguh Rianto",
+                    "email": "teguh.rianto22@gmail.com",
+                    "homepage": "http://teguhrianto22.pusku.com",
+                    "role": "Template Designer"
+                }
+            ],
+            "description": "O2System PSR it's build based on PHP Framework Interop Group (PHP-FIG) standards recommendations. This repository contains a collection of PHP interfaces based on the PSR-0 until the PSR-7.",
+            "keywords": [
+                "framework",
+                "interfaces",
+                "libraries",
+                "php",
+                "utilities"
+            ],
+            "time": "2019-01-10T16:52:24+00:00"
+        },
+        {
+            "name": "o2system/session",
+            "version": "v2.0.26",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/o2system/session.git",
+                "reference": "3ef5b5cd6f17e7a8674d7014dde5b64c9c610603"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/o2system/session/zipball/3ef5b5cd6f17e7a8674d7014dde5b64c9c610603",
+                "reference": "3ef5b5cd6f17e7a8674d7014dde5b64c9c610603",
+                "shasum": ""
+            },
+            "require": {
+                "o2system/kernel": "*",
+                "php": ">=5.6.0"
+            },
+            "type": "package",
+            "autoload": {
+                "psr-4": {
+                    "O2System\\Session\\": "src"
+                },
+                "files": [
+                    "src/Session.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "authors": [
+                {
+                    "name": "Steeven Andrian Salim",
+                    "email": "steevenz@steevenz.com",
+                    "homepage": "http://www.steevenz.com",
+                    "role": "Founder and Lead Project"
+                },
+                {
+                    "name": "Teguh Rianto",
+                    "email": "teguh.rianto22@gmail.com",
+                    "homepage": "http://teguhrianto22.pusku.com",
+                    "role": "Template Designer"
+                }
+            ],
+            "description": "Open Source PHP Session Management Library",
+            "keywords": [
+                "framework",
+                "interfaces",
+                "libraries",
+                "php",
+                "session"
+            ],
+            "time": "2019-01-10T16:54:52+00:00"
+        },
+        {
+            "name": "o2system/spl",
+            "version": "v1.0.65",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/o2system/spl.git",
+                "reference": "c9828810f6f61ab72c741bbe96714bc55704b6f5"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/o2system/spl/zipball/c9828810f6f61ab72c741bbe96714bc55704b6f5",
+                "reference": "c9828810f6f61ab72c741bbe96714bc55704b6f5",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.6.0"
+            },
+            "type": "package",
+            "autoload": {
+                "psr-4": {
+                    "O2System\\Spl\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Steeven Andrian Salim",
+                    "email": "steevenz@steevenz.com",
+                    "homepage": "http://www.steevenz.com",
+                    "role": "Founder and Lead Project"
+                },
+                {
+                    "name": "Teguh Rianto",
+                    "email": "teguh.rianto22@gmail.com",
+                    "homepage": "http://teguhrianto22.pusku.com",
+                    "role": "Template Designer"
+                }
+            ],
+            "description": "O2System Standard PHP Library (SPL) it's build based on original standard PHP library. It's made up primarily of commonly needed datastructure classes, iterators, handlers and exceptions for O2System PHP Framework, but also can be used independently outside O2System PHP Framework environment.",
+            "keywords": [
+                "framework",
+                "interfaces",
+                "libraries",
+                "php",
+                "utilities"
+            ],
+            "time": "2019-01-10T16:55:58+00:00"
+        }
+    ],
+    "packages-dev": [],
+    "aliases": [],
+    "minimum-stability": "stable",
+    "stability-flags": [],
+    "prefer-stable": false,
+    "prefer-lowest": false,
+    "platform": {
+        "php": ">=5.6.0"
+    },
+    "platform-dev": []
+}

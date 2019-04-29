@@ -13,8 +13,6 @@
 
 namespace O2System\Security\Authentication\User;
 
-// ------------------------------------------------------------------------
-
 use O2System\Spl\Patterns\Structural\Repository\AbstractRepository;
 
 /**
