@@ -2,7 +2,6 @@
   "name": "o2system/security",
   "description": "O2System Security",
   "type": "package",
-  "license": "MIT",
   "keywords": [
     "utilities",
     "php",
