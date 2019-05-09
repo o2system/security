@@ -16,8 +16,8 @@ namespace O2System\Security\Authentication;
 // ------------------------------------------------------------------------
 
 use O2System\Cache\Item;
-use Psr\Cache\CacheItemPoolInterface;
 use O2System\Spl\Traits\Collectors\ConfigCollectorTrait;
+use Psr\Cache\CacheItemPoolInterface;
 
 /**
  * Class User
@@ -263,7 +263,10 @@ class User
     public function logout()
     {
         $this->signOff();
-        unset($_SESSION[ 'account' ]);
+
+        if (isset($_SESSION[ 'account' ])) {
+            unset($_SESSION[ 'account' ]);
+        }
     }
 
     // ------------------------------------------------------------------------
