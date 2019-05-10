@@ -235,7 +235,7 @@ class Binary
      *
      * @return static
      */
-    protected function setKey($key)
+    public function setKey($key)
     {
         $this->crypt->setKey($key);
 
