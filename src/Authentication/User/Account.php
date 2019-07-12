@@ -21,12 +21,14 @@ use O2System\Spl\Patterns\Structural\Repository\AbstractRepository;
  */
 class Account extends AbstractRepository
 {
-    public function __construct(array $account)
+    public function __construct(array $account = [])
     {
-        foreach ($account as $key => $value) {
-            if (strpos($key, 'record') === false &&
-                ! in_array($key, ['password', 'pin', 'token', 'sso'])) {
-                $this->store($key, $value);
+        if(count($account)) {
+            foreach ($account as $key => $value) {
+                if (strpos($key, 'record') === false &&
+                    ! in_array($key, ['password', 'pin', 'token', 'sso'])) {
+                    $this->store($key, $value);
+                }
             }
         }
     }
