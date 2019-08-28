@@ -24,6 +24,13 @@ use O2System\Security\Encryptions\Hmac;
  */
 class Nonce
 {
+    /**
+     * Nonce::generate
+     *
+     * @param string $algorithm
+     *
+     * @return bool|string
+     */
     public static function generate($algorithm = 'HMAC-SHA1')
     {
         $data = microtime() . mt_rand();
