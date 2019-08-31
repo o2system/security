@@ -23,6 +23,18 @@ namespace O2System\Security\Filters;
 class Validation
 {
     /**
+     * Validation::isOptional
+     *
+     * @return bool
+     */
+    public static function isOptional()
+    {
+        return true;
+    }
+
+    // ------------------------------------------------------------------------
+
+    /**
      * Validation::isRequired
      *
      * @param $string
