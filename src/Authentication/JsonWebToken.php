@@ -17,7 +17,8 @@ namespace O2System\Security\Authentication;
 
 use O2System\Security\Encoders\Base64;
 use O2System\Security\Encoders\Json;
-use O2System\Security\Generators\Signature;
+use O2System\Security\Authentication\User\Signature;
+use O2System\Security\Encryptions\Algorithm;
 use O2System\Security\Generators\Token;
 
 /**
@@ -124,7 +125,7 @@ class JsonWebToken extends Token
                 $this->errors[] = 'Invalid algorithm';
 
                 return false;
-            } elseif ( ! Signature::validAlgorithm($headers->alg)) {
+            } elseif ( ! Algorithm::validate($headers->alg)) {
                 $this->errors[] = 'Unsupported algorithm';
 
                 return false;

@@ -225,10 +225,26 @@ class User
     {
         if (isset($_SESSION[ 'account' ])) {
             return true;
+        } elseif($this->tokenOn()) {
+            return true;
         } elseif ($this->signedOn()) {
-            $cacheItemPool = $this->getCacheItemPool();
-            $item = $cacheItemPool->getItem('sso-' . input()->cookie('ssid'));
-            $_SESSION[ 'account' ] = $item->get();
+            return true;
+        }
+
+        return false;
+    }
+
+    // ------------------------------------------------------------------------
+
+    /**
+     * User::tokenOn
+     */
+    public function tokenOn()
+    {
+        if(false !== ($token = input()->bearerToken())) {
+            $_SESSION['account'] = (new JsonWebToken())->decode($token);
+
+            globals()->store('account', $_SESSION['account']);
 
             return true;
         }
@@ -249,7 +265,15 @@ class User
         if ($virtualUserId = input()->cookie('ssid')) {
             $cacheItemPool = $this->getCacheItemPool();
 
-            return $cacheItemPool->hasItem('sso-' . $virtualUserId);
+            if($cacheItemPool->hasItem('sso-' . $virtualUserId)) {
+
+                $item = $cacheItemPool->getItem('sso-' . input()->cookie('ssid'));
+                $_SESSION['account'] = $item->get();
+
+                globals()->store('account', $_SESSION['account']);
+
+                return true;
+            }
         }
 
         return false;

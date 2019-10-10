@@ -1,4 +1,4 @@
-[![O2System Framework](http://o2system.id/assets/img/logo/logo-200px.png?logo)](http://o2system.id)
+[![O2System Framework](http://o2system.id/assets/img/logo/logo-white-200px.png?logo)](http://o2system.id)
 
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/o2system/security/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/o2system/security/?branch=master)
 [![Build Status](https://scrutinizer-ci.com/g/o2system/security/badges/build.png?b=master)](https://scrutinizer-ci.com/g/o2system/security/build-status/master)
@@ -15,10 +15,6 @@ O2System Security is a collection of class libraries to help build security proc
 - WebToken Authentication
 - JSON WebToken (JWT) Authentication
 - OAuth 2.0 based on JWT Authentication
-
-### Featured Blockchain
-- Block
-- Chain
 
 ### Featured One Way Encryptions
 - Password
