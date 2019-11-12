@@ -1,4 +1,4 @@
-[![O2System Framework](http://o2system.id/assets/img/logo/logo-white-200px.png?logo)](http://o2system.id)
+![alt text](https://www.o2system.id/assets/img/covers/cover-o2system-atom-security.png "O2System Security Atom")
 
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/o2system/security/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/o2system/security/?branch=master)
 [![Build Status](https://scrutinizer-ci.com/g/o2system/security/badges/build.png?b=master)](https://scrutinizer-ci.com/g/o2system/security/build-status/master)
@@ -31,9 +31,11 @@ O2System Security is a collection of class libraries to help build security proc
 
 ### Featured Filters
 - UTF8
-- Validation
 - XSS
-- Rules
+
+### Form
+- Validation
+- Validator
 
 ### Featured Generators
 - MachineID
@@ -44,6 +46,7 @@ O2System Security is a collection of class libraries to help build security proc
 - UUID
 
 ### Featured Protections
+- Blockchain
 - Throttle
 - Captcha
 - Cross Site Request Forgery (CSRF)
