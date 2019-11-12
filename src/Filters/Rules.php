@@ -116,7 +116,12 @@ class Rules
      */
     public function sets(array $rules)
     {
-        foreach ($rules as $rule) {
+        foreach ($rules as $key => $rule) {
+            if(is_string($rule)) {
+                $rule['rules'] = $rule;
+                $rule['field'] = $key;
+            }
+
             $this->add($rule[ 'field' ], $rule[ 'label' ], $rule[ 'rules' ], $rule[ 'messages' ]);
         }
     }
