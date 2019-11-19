@@ -382,7 +382,7 @@ class Validator
             // Set the error message if we didn't survive.
             if ($passed === false) {
                 $this->errors[ $field ] = is_null($error) ? $this->getErrorMessage($rule, $field, $label,
-                    $param) : $error;
+                    $params) : $error;
 
                 return false;
             }
