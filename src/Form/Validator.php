@@ -15,7 +15,6 @@ namespace O2System\Security\Form;
 
 // ------------------------------------------------------------------------
 
-use O2System\Security\Filters\Validation;
 use O2System\Spl\Traits\Collectors\ErrorCollectorTrait;
 
 /**
@@ -47,7 +46,7 @@ class Validator
      *
      * @var array
      */
-    protected $customErrors;
+    protected $customErrors = [];
 
     // ------------------------------------------------------------------------
 
@@ -61,7 +60,7 @@ class Validator
      *        'field' => 'rule1|rule2'
      *    ]
      *
-     * The $errors array should be formatted like:
+     * The $customErrors array should be formatted like:
      *    [
      *        'field' => [
      *            'rule1' => 'message',
@@ -122,7 +121,7 @@ class Validator
         ];
 
         $this->customErrors = array_merge($this->customErrors, [
-            $field => $errors,
+            $field => $customErrors,
         ]);
 
         return $this;
@@ -159,7 +158,7 @@ class Validator
 
     /**
      * Validator::setCustomRules
-     * 
+     *
      * [
      *      'rule' => function($value) {
      *           // do something here
@@ -345,7 +344,7 @@ class Validator
         }
 
         $validation = new Validation();
-        
+
         foreach ($rules as $rule) {
             // Rules is callable
             $callable = is_callable($rule);
@@ -365,9 +364,9 @@ class Validator
             }
 
             if ($params) {
-                $params = array_merge([ $value ], $params);
+                $params = array_merge([$value], $params);
             } else {
-                $params = [ $value ];
+                $params = [$value];
             }
 
             // If it's a callable, call and and get out of here.
@@ -381,6 +380,10 @@ class Validator
 
             // Set the error message if we didn't survive.
             if ($passed === false) {
+                if (isset($this->customErrors[ $field ][ $rule ])) {
+                    $error = $this->customErrors[ $field ][ $rule ];
+                }
+
                 $this->errors[ $field ] = is_null($error) ? $this->getErrorMessage($rule, $field, $label,
                     $params) : $error;
 
@@ -396,16 +399,16 @@ class Validator
      * Check; runs the validation process, returning true or false
      * determining whether validation was successful or not.
      *
-     * @param mixed    $value  Value to validation.
-     * @param string   $rule   Rule.
-     * @param string[] $errors Errors.
+     * @param mixed    $value        Value to validation.
+     * @param string   $rule         Rule.
+     * @param string[] $customErrors Errors.
      *
      * @return boolean True if valid, else false.
      */
     public function check($value, string $rule, array $customErrors = []): bool
     {
         $this->reset();
-        $this->setRule('check', null, $rule, $errors);
+        $this->setRule('check', null, $rule, $customErrors);
 
         return $this->run([
             'check' => $value,
