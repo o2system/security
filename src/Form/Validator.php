@@ -360,12 +360,14 @@ class Validator
 
             if ( ! $callable && preg_match('/(.*?)\[(.*)\]/', $rule, $match)) {
                 $rule = $match[ 1 ];
-                $params = $match[ 2 ];
+                if (is_array($match[ 2 ])) {
+                    $params = array_merge([$value], $match[ 2 ]);
+                } else {
+                    $params = [$value, $match[ 2 ]];
+                }
             }
 
-            if ($params) {
-                $params = array_merge([$value], $params);
-            } else {
+            if (empty($params)) {
                 $params = [$value];
             }
 
@@ -384,8 +386,7 @@ class Validator
                     $error = $this->customErrors[ $field ][ $rule ];
                 }
 
-                $this->errors[ $field ] = is_null($error) ? $this->getErrorMessage($rule, $field, $label,
-                    $params) : $error;
+                $this->errors[ $field ] = is_null($error) ? $this->getErrorMessage($rule, $field, $label, $value) : $error;
 
                 return false;
             }
@@ -443,11 +444,11 @@ class Validator
      * @param string      $rule
      * @param string      $field
      * @param string|null $label
-     * @param string      $param
+     * @param string      $value
      *
      * @return string
      */
-    protected function getErrorMessage(string $rule, string $field, string $label = null, string $param = null): string
+    protected function getErrorMessage(string $rule, string $field, string $label = null, string $value = null): string
     {
         // Check if custom message has been defined by user
         if (isset($this->customErrors[ $field ][ $rule ])) {
@@ -460,7 +461,7 @@ class Validator
         }
 
         $message = str_replace('{field}', $label ?? $field, $message);
-        $message = str_replace('{param}', $this->rules[ $param ][ 'label' ] ?? $param, $message);
+        $message = str_replace('{value}', $value ?? null, $message);
 
         return $message;
     }

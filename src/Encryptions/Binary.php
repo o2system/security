@@ -28,6 +28,7 @@ class Binary
      * @var array
      */
     private static $charactersMap = [];
+    
     /**
      * Binary::$crypt
      *

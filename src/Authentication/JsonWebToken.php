@@ -191,8 +191,9 @@ class JsonWebToken extends Token
 
                 return false;
             }
+            
             // Check if this token has expired.
-            if (isset($payload->exp) && ($timestamp - $this->leeway) >= $payload->exp) {
+            if (isset($payload->exp) && ($timestamp - $this->leeway) >= strtotime($payload->exp)) {
                 $this->errors[] = 'Expired token';
 
                 return false;

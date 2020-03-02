@@ -16,6 +16,7 @@ namespace O2System\Security\Authentication;
 // ------------------------------------------------------------------------
 
 use O2System\Cache\Item;
+use O2System\Spl\DataStructures\SplArrayObject;
 use O2System\Spl\Traits\Collectors\ConfigCollectorTrait;
 use Psr\Cache\CacheItemPoolInterface;
 
@@ -35,13 +36,13 @@ class User
     public function __construct()
     {
         $this->setConfig([
-            'password'    => [
+            'password' => [
                 'algorithm' => PASSWORD_DEFAULT,
-                'options'   => [],
+                'options' => [],
             ],
             'msisdnRegex' => '/^\+[1-9]{1}[0-9]{3,14}$/',
             'maxAttempts' => 5,
-            'sso'         => [
+            'sso' => [
                 'enable' => false,
                 'server' => base_url(),
             ],
@@ -95,8 +96,8 @@ class User
     {
         if (password_needs_rehash(
             $password,
-            $this->config[ 'password' ][ 'algorithm' ],
-            $this->config[ 'password' ][ 'options' ]
+            $this->config['password']['algorithm'],
+            $this->config['password']['options']
         )) {
             return $this->passwordHash($password);
         }
@@ -117,8 +118,8 @@ class User
     {
         return password_hash(
             $password,
-            $this->config[ 'password' ][ 'algorithm' ],
-            $this->config[ 'password' ][ 'options' ]
+            $this->config['password']['algorithm'],
+            $this->config['password']['options']
         );
     }
 
@@ -144,7 +145,7 @@ class User
      */
     public function attempt()
     {
-        $_SESSION[ 'userAttempts' ] = $this->getAttempts() + 1;
+        $_SESSION['userAttempts'] = $this->getAttempts() + 1;
     }
 
     // ------------------------------------------------------------------------
@@ -157,60 +158,11 @@ class User
     public function getAttempts()
     {
         $currentAttempts = 0;
-        if (isset($_SESSION[ 'userAttempts' ])) {
-            $currentAttempts = (int)$_SESSION[ 'userAttempts' ];
+        if (isset($_SESSION['userAttempts'])) {
+            $currentAttempts = (int)$_SESSION['userAttempts'];
         }
 
         return (int)$currentAttempts;
-    }
-
-    // ------------------------------------------------------------------------
-
-    /**
-     * User::login
-     *
-     * @param array $account
-     */
-    public function login(array $account)
-    {
-        $_SESSION[ 'account' ] = $account;
-        unset($_SESSION[ 'userAttempts' ]);
-    }
-
-    // ------------------------------------------------------------------------
-
-    /**
-     * User::signOn
-     *
-     * @param array $account
-     *
-     * @throws \Exception
-     */
-    public function signOn(array $account)
-    {
-        $cacheItemPool = $this->getCacheItemPool();
-        $virtualUserId = md5(json_encode($account) . mt_srand() . time());
-        $cacheItemPool->save(new Item('sso-' . $virtualUserId, $account, false));
-
-        set_cookie('ssid', $virtualUserId);
-    }
-
-    // ------------------------------------------------------------------------
-
-    /**
-     * User::getCacheItemPool
-     *
-     * @return CacheItemPoolInterface
-     */
-    protected function getCacheItemPool()
-    {
-        $cacheItemPool = cache()->getObject('default');
-
-        if (cache()->exists('sso')) {
-            $cacheItemPool = cache()->getObject('sso');
-        }
-
-        return $cacheItemPool;
     }
 
     // ------------------------------------------------------------------------
@@ -223,11 +175,7 @@ class User
      */
     public function loggedIn()
     {
-        if (isset($_SESSION[ 'account' ])) {
-            return true;
-        } elseif($this->tokenOn()) {
-            return true;
-        } elseif ($this->signedOn()) {
+        if (isset($_SESSION['account'])) {
             return true;
         }
 
@@ -237,46 +185,13 @@ class User
     // ------------------------------------------------------------------------
 
     /**
-     * User::tokenOn
-     */
-    public function tokenOn()
-    {
-        if(false !== ($token = input()->bearerToken())) {
-            $_SESSION['account'] = (new JsonWebToken())->decode($token);
-
-            globals()->store('account', $_SESSION['account']);
-
-            return true;
-        }
-
-        return false;
-    }
-
-    // ------------------------------------------------------------------------
-
-    /**
-     * User::signedOn
+     * AccessControl::login
      *
-     * @return bool
-     * @throws \Psr\Cache\InvalidArgumentException
+     * @param array $account
      */
-    public function signedOn()
+    public function login(array $account)
     {
-        if ($virtualUserId = input()->cookie('ssid')) {
-            $cacheItemPool = $this->getCacheItemPool();
-
-            if($cacheItemPool->hasItem('sso-' . $virtualUserId)) {
-
-                $item = $cacheItemPool->getItem('sso-' . input()->cookie('ssid'));
-                $_SESSION['account'] = $item->get();
-
-                globals()->store('account', $_SESSION['account']);
-
-                return true;
-            }
-        }
-
-        return false;
+        $_SESSION['account'] = $account;
     }
 
     // ------------------------------------------------------------------------
@@ -286,26 +201,8 @@ class User
      */
     public function logout()
     {
-        $this->signOff();
-
-        if (isset($_SESSION[ 'account' ])) {
-            unset($_SESSION[ 'account' ]);
-        }
-    }
-
-    // ------------------------------------------------------------------------
-
-    /**
-     * User::signOff
-     *
-     * @throws \Psr\Cache\InvalidArgumentException
-     */
-    public function signOff()
-    {
-        if ($virtualUserId = input()->cookie('ssid')) {
-            $cacheItemPool = $this->getCacheItemPool();
-            $cacheItemPool->deleteItem('sso-' . $virtualUserId);
-            delete_cookie('ssid');
+        if (isset($_SESSION['account'])) {
+            unset($_SESSION['account']);
         }
     }
 }
