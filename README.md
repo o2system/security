@@ -1,4 +1,4 @@
-![alt text](https://repository-images.githubusercontent.com/75949178/d960b700-5c98-11ea-813c-a94432078605 "O2System Security Atom")
+![alt text](https://www.o2system.id/assets/img/covers/cover-o2system-atom-security.png "O2System Security Atom")
 
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/o2system/security/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/o2system/security/?branch=master)
 [![Build Status](https://scrutinizer-ci.com/g/o2system/security/badges/build.png?b=master)](https://scrutinizer-ci.com/g/o2system/security/build-status/master)
@@ -24,7 +24,6 @@ O2System Security is a collection of class libraries to help build security proc
 - Binary
 - Cookie
 - Crypt via PHP's MCrypt and/or OpenSSL extensions
-- Hexadecimal
 
 ### Featured Encoders
 - Base64
