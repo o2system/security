@@ -24,7 +24,6 @@ O2System Security is a collection of class libraries to help build security proc
 - Binary
 - Cookie
 - Crypt via PHP's MCrypt and/or OpenSSL extensions
-- Hexadecimal
 
 ### Featured Encoders
 - Base64
