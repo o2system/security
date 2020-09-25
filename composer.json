@@ -1,5 +1,6 @@
 {
   "name": "o2system/security",
+  "license": "MIT",
   "description": "O2System Security",
   "type": "package",
   "keywords": [
